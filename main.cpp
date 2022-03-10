@@ -33,6 +33,12 @@ int	main(int argc, char* argv[]){
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glEnable(GL_DEPTH_TEST);
 		glDepthMask(GL_TRUE);
+		glEnable(GL_LIGHTING);
+		glEnable(GL_LIGHT0);
+		GLfloat ambientLightFull[] = { 1.0f, 0.25f, 0.20f, 0.0f };
+		glLightModelfv(GL_LIGHT_MODEL_AMBIENT, ambientLightFull);
+		float gray[] = {0.75f, 0.75f, 0.75f, 1.0f};
+		glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, gray);
 
 		const float radius = 0.5;
 
@@ -60,7 +66,53 @@ int	main(int argc, char* argv[]){
 
 		glTranslatef(0.0, 0.0, -2.0);
 
-		glBegin(GL_TRIANGLES);
+		vec3 p0 = vec3(-1.0, -1.0, 1.0);
+		vec3 p1 = vec3(-1.0, 1.0, 1.0);
+		vec3 p2 = vec3(1.0, 1.0, 1.0);
+		vec3 p3 = vec3(1.0, -1.0, 1.0);
+		vec3 p4 = vec3(-1.0, -1.0, -1.0);
+		vec3 p5 = vec3(-1.0, 1.0, -1.0);
+		vec3 p6 = vec3(1.0, 1.0, -1.0);
+		vec3 p7 = vec3(1.0, -1.0, -1.0);
+		
+		Geometry test;
+
+
+		test.m_Pos = {
+			p0,p1,p2,p3,
+			p0,p1,p4,p5,
+			p4,p5,p6,p7,
+			p7,p6,p2,p3,
+			p0,p3,p4,p7,
+			p1,p2,p5,p6
+		};
+
+		test.m_Normals = {
+			vec3(0.0,0.0,1.0),vec3(0.0,0.0,1.0),vec3(0.0,0.0,1.0),vec3(0.0,0.0,1.0),
+			vec3(-1.0,0.0,0.0),vec3(-1.0,0.0,0.0),vec3(-1.0,0.0,0.0),vec3(-1.0,0.0,0.0),
+			vec3(0.0,0.0,-1.0),vec3(0.0,0.0,-1.0),vec3(0.0,0.0,-1.0),vec3(0.0,0.0,-1.0),
+			vec3(1.0,0.0,0.0),vec3(1.0,0.0,0.0),vec3(1.0,0.0,0.0),vec3(1.0,0.0,0.0),
+			vec3(0.0,-1.0,0.0),vec3(0.0,-1.0,0.0),vec3(0.0,-1.0,0.0),vec3(0.0,-1.0,0.0),
+			vec3(0.0,1.0,0.0),vec3(0.0,1.0,0.0),vec3(0.0,1.0,0.0),vec3(0.0,1.0,0.0),
+		};
+
+		test.m_Indices = {
+			0,1,2,0,2,3,
+			4,5,6,5,6,7,
+			8,9,10,8,10,11,
+			12,13,14,12,14,15,
+			16,17,18,16,18,19,
+			20,21,22,21,22,23
+		};
+
+		/*test.m_Indices = {
+
+		};*/
+
+		test.Bind();
+		test.Draw();
+
+		/*glBegin(GL_TRIANGLES);
 		//Front
 		glColor4f(0.0, 1.0, 0.0, 1.0);
 		glVertex3f(-1.0f, -1.0f, 1.0f);    
@@ -110,7 +162,7 @@ int	main(int argc, char* argv[]){
 		glVertex3f(1.0f, -1.0f, -1.0f);
 		glVertex3f(-1.0f, -1.0f, -1.0f);
 
-		glEnd();
+		glEnd();*/
 
 		SDL_GL_SwapWindow(win);
 

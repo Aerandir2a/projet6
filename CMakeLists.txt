@@ -1,6 +1,6 @@
 project(moteur)
 
-add_executable(moteur main.cpp gc_3d_defs.hpp geometry.cpp)
+add_executable(moteur main.cpp gc_3d_defs.hpp)
 
 add_subdirectory(SDL dep/SDL)
 
