@@ -1,0 +1,11 @@
+# ninja log v5
+0	159	6686927106351497	glew_archive-populate-prefix/src/glew_archive-populate-stamp/glew_archive-populate-mkdir	8909e77a7119a969
+159	3267	6686927137431586	glew_archive-populate-prefix/src/glew_archive-populate-stamp/glew_archive-populate-download	7580991eb48e71d3
+3267	3315	6686927137911697	glew_archive-populate-prefix/src/glew_archive-populate-stamp/glew_archive-populate-update	3bbe94bee0167cc3
+3315	3362	6686927138389389	glew_archive-populate-prefix/src/glew_archive-populate-stamp/glew_archive-populate-patch	aa8ae7b9bfe5a300
+3362	3410	6686927138857677	glew_archive-populate-prefix/src/glew_archive-populate-stamp/glew_archive-populate-configure	5cea16f47f449246
+3458	3505	6686927139817889	glew_archive-populate-prefix/src/glew_archive-populate-stamp/glew_archive-populate-install	eba25c412c729f1a
+3410	3457	6686927139337776	glew_archive-populate-prefix/src/glew_archive-populate-stamp/glew_archive-populate-build	42aec7913f479290
+3506	3558	6686927140348004	glew_archive-populate-prefix/src/glew_archive-populate-stamp/glew_archive-populate-test	167bfe696899a4c0
+3558	3623	6686927140988145	CMakeFiles/glew_archive-populate-complete	4a2df83bf1f0357a
+3558	3623	6686927140988145	glew_archive-populate-prefix/src/glew_archive-populate-stamp/glew_archive-populate-done	4a2df83bf1f0357a

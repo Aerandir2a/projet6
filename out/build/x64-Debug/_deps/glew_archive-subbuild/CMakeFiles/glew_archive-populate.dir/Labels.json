@@ -1,0 +1,46 @@
+{
+	"sources" : 
+	[
+		{
+			"file" : "D:/Users/ppiglioni/projet6/out/build/x64-Debug/_deps/glew_archive-subbuild/CMakeFiles/glew_archive-populate"
+		},
+		{
+			"file" : "D:/Users/ppiglioni/projet6/out/build/x64-Debug/_deps/glew_archive-subbuild/CMakeFiles/glew_archive-populate.rule"
+		},
+		{
+			"file" : "D:/Users/ppiglioni/projet6/out/build/x64-Debug/_deps/glew_archive-subbuild/CMakeFiles/glew_archive-populate-complete.rule"
+		},
+		{
+			"file" : "D:/Users/ppiglioni/projet6/out/build/x64-Debug/_deps/glew_archive-subbuild/glew_archive-populate-prefix/src/glew_archive-populate-stamp/glew_archive-populate-build.rule"
+		},
+		{
+			"file" : "D:/Users/ppiglioni/projet6/out/build/x64-Debug/_deps/glew_archive-subbuild/glew_archive-populate-prefix/src/glew_archive-populate-stamp/glew_archive-populate-configure.rule"
+		},
+		{
+			"file" : "D:/Users/ppiglioni/projet6/out/build/x64-Debug/_deps/glew_archive-subbuild/glew_archive-populate-prefix/src/glew_archive-populate-stamp/glew_archive-populate-download.rule"
+		},
+		{
+			"file" : "D:/Users/ppiglioni/projet6/out/build/x64-Debug/_deps/glew_archive-subbuild/glew_archive-populate-prefix/src/glew_archive-populate-stamp/glew_archive-populate-install.rule"
+		},
+		{
+			"file" : "D:/Users/ppiglioni/projet6/out/build/x64-Debug/_deps/glew_archive-subbuild/glew_archive-populate-prefix/src/glew_archive-populate-stamp/glew_archive-populate-mkdir.rule"
+		},
+		{
+			"file" : "D:/Users/ppiglioni/projet6/out/build/x64-Debug/_deps/glew_archive-subbuild/glew_archive-populate-prefix/src/glew_archive-populate-stamp/glew_archive-populate-patch.rule"
+		},
+		{
+			"file" : "D:/Users/ppiglioni/projet6/out/build/x64-Debug/_deps/glew_archive-subbuild/glew_archive-populate-prefix/src/glew_archive-populate-stamp/glew_archive-populate-test.rule"
+		},
+		{
+			"file" : "D:/Users/ppiglioni/projet6/out/build/x64-Debug/_deps/glew_archive-subbuild/glew_archive-populate-prefix/src/glew_archive-populate-stamp/glew_archive-populate-update.rule"
+		}
+	],
+	"target" : 
+	{
+		"labels" : 
+		[
+			"glew_archive-populate"
+		],
+		"name" : "glew_archive-populate"
+	}
+}

@@ -1,10 +1,10 @@
 #pragma once 
 
 #include <chrono>
-
+#include<GL/glew.h>
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
-
+#include<gl/GL.h>
 #include <vector>;
 #include <SDL_opengl.h>
 
