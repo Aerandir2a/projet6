@@ -23,7 +23,9 @@ int	main(int argc, char* argv[]){
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glewInit();
 
-	GLuint programID = LoadShaders("D:/Users/ppiglioni/projet6/shader/TranformVertexShader.vertexshader.txt", "D:/Users/ppiglioni/projet6/shader/SimpleFragmentShader.fragmentshader.txt");
+	GLuint programID = LoadShaders(
+		"C:/Users/LenyN/Documents/GitHub/PROJET__6/shader/TranformVertexShader.vertexshader.txt",
+		"C:/Users/LenyN/Documents/GitHub/PROJET__6/shader/SimpleFragmentShader.fragmentshader.txt");
 	
 
 	// Get a handle for our "MVP" uniform
