@@ -1,6 +1,6 @@
 project(moteur)
 
-add_executable(moteur main.cpp gc_3d_defs.hpp shader/shader.hpp shader/loadShader.cpp shader/TranformVertexShader.vertexshader.txt shader/SimpleFragmentShader.fragmentshader.txt)
+add_executable(moteur main.cpp gc_3d_defs.hpp shader/shader.hpp shader/loadShader.cpp shader/TranformVertexShader.vertexshader.txt shader/SimpleFragmentShader.fragmentshader.txt stb_image.h images/UwU.jpg images/UwU2.jpg)
 
 add_subdirectory(SDL dep/SDL)
 

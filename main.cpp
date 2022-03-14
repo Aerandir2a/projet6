@@ -5,6 +5,9 @@
 #endif
 #include"gc_3d_defs.hpp"
 #include"shader/shader.hpp"
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
+
 
 
 using namespace GC_3D;
@@ -25,10 +28,37 @@ int	main(int argc, char* argv[]){
 
 	GLuint programID = LoadShaders("D:/Users/ppiglioni/projet6/shader/TranformVertexShader.vertexshader.txt", "D:/Users/ppiglioni/projet6/shader/SimpleFragmentShader.fragmentshader.txt");
 	
-
+	//permet d'afficher la face avant mais pas la face derrière
+	glEnable(GL_CULL_FACE);
+	glCullFace(GL_FRONT);
+	
 	// Get a handle for our "MVP" uniform
 	// Only during the initialisation
 	GLuint MatrixID = glGetUniformLocation(programID, "MVP");
+
+	GLuint TextureID = glGetUniformLocation(programID, "myTextureSampler");
+
+	GLuint Texture;
+	glGenTextures(1, &Texture);
+	glBindTexture(GL_TEXTURE_2D, Texture);
+	// set the texture wrapping/filtering options (on the currently bound texture object)
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	// load and generate the texture
+	int width, height, nrChannels;
+	unsigned char* data = stbi_load("D:/users/ppiglioni/projet6/images/UwU2.jpg", &width, &height, &nrChannels, 0);
+
+	if (data)
+	{
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+		glGenerateMipmap(GL_TEXTURE_2D);
+	}
+	else
+	{
+		std::cout << "Failed to load texture" << std::endl;
+	}
 
 	GLuint VertexArrayID;
 	glGenVertexArrays(1, &VertexArrayID);
@@ -42,7 +72,7 @@ int	main(int argc, char* argv[]){
 
 	// Camera matrix
 	mat4 View = lookAt(
-		vec3(4, 3, 3), // Camera is at (4,3,3), in World Space
+		vec3(4, 2, 4), // Camera is at (4,3,3), in World Space
 		vec3(0, 0, 0), // and looks at the origin
 		vec3(0, 1, 0)  // Head is up (set to 0,-1,0 to look upside-down)
 	);
@@ -53,42 +83,23 @@ int	main(int argc, char* argv[]){
 	mat4 MVP = Projection * View * Model; // Remember, matrix multiplication is the other way around
 
 	static const GLfloat g_vertex_buffer_data[] = {
-			-1.0f,-1.0f,-1.0f, // triangle 1 : begin
-		-1.0f,-1.0f, 1.0f,
-		-1.0f, 1.0f, 1.0f, // triangle 1 : end
-		1.0f, 1.0f,-1.0f, // triangle 2 : begin
-		-1.0f,-1.0f,-1.0f,
-		-1.0f, 1.0f,-1.0f, // triangle 2 : end
-		1.0f,-1.0f, 1.0f,
-		-1.0f,-1.0f,-1.0f,
-		1.0f,-1.0f,-1.0f,
-		1.0f, 1.0f,-1.0f,
-		1.0f,-1.0f,-1.0f,
-		-1.0f,-1.0f,-1.0f,
-		-1.0f,-1.0f,-1.0f,
-		-1.0f, 1.0f, 1.0f,
-		-1.0f, 1.0f,-1.0f,
-		1.0f,-1.0f, 1.0f,
-		-1.0f,-1.0f, 1.0f,
-		-1.0f,-1.0f,-1.0f,
-		-1.0f, 1.0f, 1.0f,
-		-1.0f,-1.0f, 1.0f,
-		1.0f,-1.0f, 1.0f,
-		1.0f, 1.0f, 1.0f,
-		1.0f,-1.0f,-1.0f,
-		1.0f, 1.0f,-1.0f,
-		1.0f,-1.0f,-1.0f,
-		1.0f, 1.0f, 1.0f,
-		1.0f,-1.0f, 1.0f,
-		1.0f, 1.0f, 1.0f,
-		1.0f, 1.0f,-1.0f,
-		-1.0f, 1.0f,-1.0f,
-		1.0f, 1.0f, 1.0f,
-		-1.0f, 1.0f,-1.0f,
-		-1.0f, 1.0f, 1.0f,
-		1.0f, 1.0f, 1.0f,
-		-1.0f, 1.0f, 1.0f,
-		1.0f,-1.0f, 1.0f
+		-1.0f, -1.0f, 1.0f,-1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f,
+		1.0f, 1.0f, 1.0f,1.0f, -1.0f, 1.0f,-1.0f, -1.0f, 1.0f, // face avant
+
+		-1.0f, -1.0f, -1.0f, -1.0f, 1.0f, -1.0f, -1.0f, 1.0f, 1.0f,
+		-1.0f, 1.0f, 1.0f, -1.0f, -1.0f, 1.0f, -1.0f, -1.0f, -1.0f, // face gauche
+
+		1.0f, -1.0f, -1.0f, 1.0f, 1.0f, -1.0f, -1.0f, 1.0f, -1.0f,
+		-1.0f, 1.0f, -1.0f, -1.0f, -1.0f, -1.0f, 1.0f, -1.0f, -1.0f, // face derrière
+
+		1.0f, -1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, -1.0f,
+		1.0f, 1.0f, -1.0f, 1.0f, -1.0f, -1.0f, 1.0f, -1.0f, 1.0f, // face droite
+
+		 -1.0f, 1.0f, 1.0f, -1.0f, 1.0f, -1.0f, 1.0f, 1.0f, -1.0f,
+		 1.0f, 1.0f, -1.0f, 1.0f, 1.0f, 1.0f, -1.0f, 1.0f, 1.0f, // face dessus
+
+		 -1.0f, -1.0f, -1.0f, -1.0f, -1.0f, 1.0f, 1.0f, -1.0f, 1.0f,
+		 1.0f, -1.0f, 1.0f, 1.0f, -1.0f, -1.0f, -1.0f, -1.0f, -1.0f, // face dessous
 	};
 
 	static const GLfloat g_color_buffer_data[] = {
@@ -130,6 +141,51 @@ int	main(int argc, char* argv[]){
 	0.982f,  0.099f,  0.879f
 	};
 
+	// Two UV coordinatesfor each vertex. They were created with Blender. You'll learn shortly how to do this yourself.
+	static const GLfloat g_uv_buffer_data[] = {
+		0.0f, 0.0f,// face avant
+		0.0f, 1.0f,
+		1.0f, 1.0f,
+		1.0f, 1.0f,
+		1.0f,0.0f,
+		0.0f, 0.0f,
+
+		0.0f, 0.0f,// face gauche
+		0.0f, 1.0f,
+		1.0f, 1.0f,
+		1.0f, 1.0f,
+		1.0f,0.0f,
+		0.0f, 0.0f,
+
+		0.0f, 0.0f,// face derrière
+		0.0f, 1.0f,
+		1.0f, 1.0f,
+		1.0f, 1.0f,
+		1.0f,0.0f,
+		0.0f, 0.0f,
+
+		0.0f, 0.0f,// face droite
+		0.0f, 1.0f,
+		1.0f, 1.0f,
+		1.0f, 1.0f,
+		1.0f,0.0f,
+		0.0f, 0.0f,
+
+		0.0f, 0.0f,// face dessus
+		0.0f, 1.0f,
+		1.0f, 1.0f,
+		1.0f, 1.0f,
+		1.0f,0.0f,
+		0.0f, 0.0f,
+
+		0.0f, 0.0f,// face dessous
+		0.0f, 1.0f,
+		1.0f, 1.0f,
+		1.0f, 1.0f,
+		1.0f,0.0f,
+		0.0f, 0.0f,
+	};
+
 	GLuint vertexbuffer;
 	// Generate 1 buffer, put the resulting identifier in vertexbuffer
 	glGenBuffers(1, &vertexbuffer);
@@ -142,6 +198,11 @@ int	main(int argc, char* argv[]){
 	glGenBuffers(1, &colorbuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(g_color_buffer_data), g_color_buffer_data, GL_STATIC_DRAW);
+
+	GLuint uvbuffer;
+	glGenBuffers(1, &uvbuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(g_uv_buffer_data), g_uv_buffer_data, GL_STATIC_DRAW);
 
 	bool appRunning = true;
 	while (appRunning) {
@@ -158,6 +219,12 @@ int	main(int argc, char* argv[]){
 		// Send our transformation to the currently bound shader, in the "MVP" uniform
 		// This is done in the main loop since each model will have a different MVP matrix (At least for the M part)
 		glUniformMatrix4fv(MatrixID, 1, GL_FALSE, value_ptr(MVP));
+
+		// Bind our texture in Texture Unit 0
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, Texture);
+		// Set our "myTextureSampler" sampler to use Texture Unit 0
+		glUniform1i(TextureID, 0);
 
 		glEnableVertexAttribArray(0);
 		glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
@@ -181,6 +248,19 @@ int	main(int argc, char* argv[]){
 			0,                                // stride
 			(void*)0                          // array buffer offset
 		);
+
+		// 2nd attribute buffer : UVs
+		glEnableVertexAttribArray(1);
+		glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
+		glVertexAttribPointer(
+			1,                                // attribute. No particular reason for 1, but must match the layout in the shader.
+			2,                                // size : U+V => 2
+			GL_FLOAT,                         // type
+			GL_FALSE,                         // normalized?
+			0,                                // stride
+			(void*)0                          // array buffer offset
+		);
+
 		// Draw the triangle !
 		glDrawArrays(GL_TRIANGLES, 0, 12*3); // Starting from vertex 0; 3 vertices total -> 1 triangle
 		glDisableVertexAttribArray(0);	
