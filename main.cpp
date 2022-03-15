@@ -7,6 +7,10 @@
 #include"shader/shader.hpp"
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
+#include "dep/imgui/imgui.h"
+#include "dep/imgui/backends/imgui_impl_opengl3.h"
+#include "dep/imgui/backends/imgui_impl_sdl.h"
+
 
 
 
@@ -25,6 +29,16 @@ int	main(int argc, char* argv[]){
 	glViewport(0, 0, 1024, 768);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glewInit();
+
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+	ImGuiIO& io = ImGui::GetIO();
+	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;  // Enable Keyboard Controls
+
+	ImGui_ImplSDL2_InitForOpenGL(win, context);
+	ImGui_ImplOpenGL3_Init();
+
+	ImGui::StyleColorsDark();
 
 	GLuint programID = LoadShaders("D:/Users/ppiglioni/projet6/shader/TranformVertexShader.vertexshader.txt", "D:/Users/ppiglioni/projet6/shader/SimpleFragmentShader.fragmentshader.txt");
 	
@@ -49,6 +63,8 @@ int	main(int argc, char* argv[]){
 	// load and generate the texture
 	int width, height, nrChannels;
 	unsigned char* data = stbi_load("D:/users/ppiglioni/projet6/images/UwU2.jpg", &width, &height, &nrChannels, 0);
+
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
 	if (data)
 	{
@@ -204,13 +220,24 @@ int	main(int argc, char* argv[]){
 	glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(g_uv_buffer_data), g_uv_buffer_data, GL_STATIC_DRAW);
 
+	auto time = Clock::now();
+
 	bool appRunning = true;
 	while (appRunning) {
-
+		
 		SDL_Event curEvent;
 		while (SDL_PollEvent(&curEvent))
 		{
-			//SDL_Quit();
+			ImGui_ImplSDL2_ProcessEvent(&curEvent);
+			if (!io.WantCaptureMouse)
+			{
+				//use mouse events not already used by ImGui
+			}
+			if (!io.WantCaptureKeyboard)
+			{
+				//use keyboard events not already used by ImGui
+			}
+			//... app processing other events;
 		}
 
 		glClear(GL_COLOR_BUFFER_BIT);
@@ -225,6 +252,19 @@ int	main(int argc, char* argv[]){
 		glBindTexture(GL_TEXTURE_2D, Texture);
 		// Set our "myTextureSampler" sampler to use Texture Unit 0
 		glUniform1i(TextureID, 0);
+
+		ImGui_ImplOpenGL3_NewFrame();
+		ImGui_ImplSDL2_NewFrame(win);
+
+		ImGui::NewFrame();
+		
+		auto curTime = Clock::now();
+		std::chrono::duration<float> elapsedSeconds = curTime - time;
+
+		ImGui::Begin("Perfs");
+		ImGui::LabelText("Frame Time (s) : ", "%f", elapsedSeconds * 1e-0);
+		ImGui::LabelText("FPS : ", "%f",  1 / elapsedSeconds.count());
+		ImGui::End();
 
 		glEnableVertexAttribArray(0);
 		glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
@@ -265,7 +305,14 @@ int	main(int argc, char* argv[]){
 		glDrawArrays(GL_TRIANGLES, 0, 12*3); // Starting from vertex 0; 3 vertices total -> 1 triangle
 		glDisableVertexAttribArray(0);	
 
+		//... App rendering
 
+		//Rendering end
+
+		ImGui::Render();
+		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+		//Swap window as usual
 		SDL_GL_SwapWindow(win);
 	}
 
