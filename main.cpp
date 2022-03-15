@@ -14,6 +14,7 @@
 
 
 
+
 using namespace GC_3D;
 
 int	main(int argc, char* argv[]){
@@ -30,15 +31,18 @@ int	main(int argc, char* argv[]){
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glewInit();
 
+
+
+	//init ImGUI
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO();
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;  // Enable Keyboard Controls
-
 	ImGui_ImplSDL2_InitForOpenGL(win, context);
 	ImGui_ImplOpenGL3_Init();
-
 	ImGui::StyleColorsDark();
+
+
 
 	GLuint programID = LoadShaders("C:/Users/lnicolas/Documents/GitHub/projet6/shader/TranformVertexShader.vertexshader.txt", "C:/Users/lnicolas/Documents/GitHub/projet6/shader/SimpleFragmentShader.fragmentshader.txt");
 	
@@ -62,7 +66,7 @@ int	main(int argc, char* argv[]){
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	// load and generate the texture
 	int width, height, nrChannels;
-	unsigned char* data = stbi_load("C:/Users/lnicolas/Documents/GitHub/projet6/images/uwu.gif", &width, &height, &nrChannels, 0);
+	unsigned char* data = stbi_load("C:/Users/lnicolas/Documents/GitHub/projet6/images/portal.png", &width, &height, &nrChannels, 0);
 
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
@@ -225,6 +229,7 @@ int	main(int argc, char* argv[]){
 	bool appRunning = true;
 	while (appRunning) {
 		
+		//SDL event pump ImGUI
 		SDL_Event curEvent;
 		while (SDL_PollEvent(&curEvent))
 		{
@@ -253,6 +258,9 @@ int	main(int argc, char* argv[]){
 		// Set our "myTextureSampler" sampler to use Texture Unit 0
 		glUniform1i(TextureID, 0);
 
+
+
+		//Render Loop
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplSDL2_NewFrame(win);
 
@@ -261,12 +269,23 @@ int	main(int argc, char* argv[]){
 		auto curTime = Clock::now();
 		std::chrono::duration<float> elapsedSeconds = curTime - time;
 
+		// Draw some widgets ImGui
 		ImGui::Begin("Perfs");
-		ImGui::LabelText("Time (s) : ", "%f", elapsedSeconds * 1e-0);
 
-		ImGui::LabelText("Frame Time (s) : ", "%f", elapsedSeconds * 1e-0);
-		ImGui::LabelText("FPS : ", "%f",  1 / elapsedSeconds.count());
+		ImGui::LabelText("Time (s) : ", "Time (s) : %f", elapsedSeconds * 1e-0);
+		float FrameTime = 0;
+		float FPS = 0;
+		ImGui::LabelText("Frame Time (s) : ", "Frame  Time (s) : %f", FrameTime);
+		ImGui::LabelText("FPS : ", "FPS : %f",  FPS);
+		
+		
+		
+		ImGui::Button("Click Button!");
+
 		ImGui::End();
+
+
+
 
 		glEnableVertexAttribArray(0);
 		glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
@@ -307,10 +326,9 @@ int	main(int argc, char* argv[]){
 		glDrawArrays(GL_TRIANGLES, 0, 12*3); // Starting from vertex 0; 3 vertices total -> 1 triangle
 		glDisableVertexAttribArray(0);	
 
-		//... App rendering
+		
 
-		//Rendering end
-
+		//Render ImGui
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
