@@ -10,6 +10,7 @@
 #include "dep/imgui/imgui.h"
 #include "dep/imgui/backends/imgui_impl_opengl3.h"
 #include "dep/imgui/backends/imgui_impl_sdl.h"
+#include "stb.c"
 
 
 
@@ -60,9 +61,15 @@ int	main(int argc, char* argv[]){
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	// load and generate the texture
+
+	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_COMBINE);
+	glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_RGB, GL_MODULATE);
+	
+
 	int width, height, nrChannels;
-	unsigned char* data = stbi_load("D:/users/ppiglioni/projet6/images/UwU2.jpg", &width, &height, &nrChannels, 0);
+	unsigned char* data = stbi_load("D:/users/ppiglioni/projet6/images/UwU3.gif", &width, &height, &nrChannels, 0);
+
+	//unsigned char* data = stbi_xload_file("D:/users/ppiglioni/projet6/images/UwU3.gif",);
 
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
@@ -99,7 +106,7 @@ int	main(int argc, char* argv[]){
 	mat4 MVP = Projection * View * Model; // Remember, matrix multiplication is the other way around
 
 	static const GLfloat g_vertex_buffer_data[] = {
-		-1.0f, -1.0f, 1.0f,-1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f,
+		-1.0f, -1.0f, 1.0f, -1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f,
 		1.0f, 1.0f, 1.0f,1.0f, -1.0f, 1.0f,-1.0f, -1.0f, 1.0f, // face avant
 
 		-1.0f, -1.0f, -1.0f, -1.0f, 1.0f, -1.0f, -1.0f, 1.0f, 1.0f,
@@ -159,47 +166,47 @@ int	main(int argc, char* argv[]){
 
 	// Two UV coordinatesfor each vertex. They were created with Blender. You'll learn shortly how to do this yourself.
 	static const GLfloat g_uv_buffer_data[] = {
-		0.0f, 0.0f,// face avant
-		0.0f, 1.0f,
-		1.0f, 1.0f,
-		1.0f, 1.0f,
-		1.0f,0.0f,
+		0.0f, 1.0f,// face avant
 		0.0f, 0.0f,
+		1.0f, 0.0f,
+		1.0f, 0.0f,
+		1.0f, 1.0f,
+		0.0f, 1.0f,
 
-		0.0f, 0.0f,// face gauche
-		0.0f, 1.0f,
-		1.0f, 1.0f,
-		1.0f, 1.0f,
-		1.0f,0.0f,
+		0.0f, 1.0f,// face gauche
 		0.0f, 0.0f,
+		1.0f, 0.0f,
+		1.0f, 0.0f,
+		1.0f, 1.0f,
+		0.0f, 1.0f,
 
-		0.0f, 0.0f,// face derrière
-		0.0f, 1.0f,
-		1.0f, 1.0f,
-		1.0f, 1.0f,
-		1.0f,0.0f,
+		0.0f, 1.0f,// face derrière
 		0.0f, 0.0f,
+		1.0f, 0.0f,
+		1.0f, 0.0f,
+		1.0f, 1.0f,
+		0.0f, 1.0f,
 
-		0.0f, 0.0f,// face droite
-		0.0f, 1.0f,
-		1.0f, 1.0f,
-		1.0f, 1.0f,
-		1.0f,0.0f,
+		0.0f, 1.0f,// face droite
 		0.0f, 0.0f,
+		1.0f, 0.0f,
+		1.0f, 0.0f,
+		1.0f, 1.0f,
+		0.0f, 1.0f,
 
-		0.0f, 0.0f,// face dessus
-		0.0f, 1.0f,
-		1.0f, 1.0f,
-		1.0f, 1.0f,
-		1.0f,0.0f,
+		0.0f, 1.0f,// face dessus
 		0.0f, 0.0f,
+		1.0f, 0.0f,
+		1.0f, 0.0f,
+		1.0f, 1.0f,
+		0.0f, 1.0f,
 
-		0.0f, 0.0f,// face dessous
-		0.0f, 1.0f,
-		1.0f, 1.0f,
-		1.0f, 1.0f,
-		1.0f,0.0f,
+		0.0f, 1.0f,// face dessous
 		0.0f, 0.0f,
+		1.0f, 0.0f,
+		1.0f, 0.0f,
+		1.0f, 1.0f,
+		0.0f, 1.0f,
 	};
 
 	GLuint vertexbuffer;

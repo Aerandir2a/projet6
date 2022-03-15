@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.23)
 
 project(moteur)
 
-add_executable(moteur main.cpp gc_3d_defs.hpp shader/shader.hpp shader/loadShader.cpp shader/TranformVertexShader.vertexshader.txt shader/SimpleFragmentShader.fragmentshader.txt stb_image.h images/UwU.jpg images/UwU2.jpg)
+add_executable(moteur main.cpp gc_3d_defs.hpp shader/shader.hpp shader/loadShader.cpp shader/TranformVertexShader.vertexshader.txt shader/SimpleFragmentShader.fragmentshader.txt stb_image.h stb_image_write.h stb.c images/UwU3.gif images/UwU2.jpg)
 
 add_subdirectory(SDL dep/SDL)
 
