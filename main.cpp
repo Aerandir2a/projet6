@@ -40,7 +40,7 @@ int	main(int argc, char* argv[]){
 
 	ImGui::StyleColorsDark();
 
-	GLuint programID = LoadShaders("D:/Users/ppiglioni/projet6/shader/TranformVertexShader.vertexshader.txt", "D:/Users/ppiglioni/projet6/shader/SimpleFragmentShader.fragmentshader.txt");
+	GLuint programID = LoadShaders("C:/Users/lnicolas/Documents/GitHub/projet6/shader/TranformVertexShader.vertexshader.txt", "C:/Users/lnicolas/Documents/GitHub/projet6/shader/SimpleFragmentShader.fragmentshader.txt");
 	
 	//permet d'afficher la face avant mais pas la face derrière
 	glEnable(GL_CULL_FACE);
@@ -62,7 +62,7 @@ int	main(int argc, char* argv[]){
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	// load and generate the texture
 	int width, height, nrChannels;
-	unsigned char* data = stbi_load("D:/users/ppiglioni/projet6/images/UwU2.jpg", &width, &height, &nrChannels, 0);
+	unsigned char* data = stbi_load("C:/Users/lnicolas/Documents/GitHub/projet6/images/uwu.gif", &width, &height, &nrChannels, 0);
 
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
@@ -262,6 +262,8 @@ int	main(int argc, char* argv[]){
 		std::chrono::duration<float> elapsedSeconds = curTime - time;
 
 		ImGui::Begin("Perfs");
+		ImGui::LabelText("Time (s) : ", "%f", elapsedSeconds * 1e-0);
+
 		ImGui::LabelText("Frame Time (s) : ", "%f", elapsedSeconds * 1e-0);
 		ImGui::LabelText("FPS : ", "%f",  1 / elapsedSeconds.count());
 		ImGui::End();
