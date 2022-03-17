@@ -272,11 +272,11 @@ int	main(int argc, char* argv[]){
 		// Draw some widgets ImGui
 		ImGui::Begin("Perfs");
 
-		ImGui::LabelText("Time (s) : ", "Time (s) : %f", elapsedSeconds * 1e-0);
+		ImGui::LabelText("", "Time (s) : %f", elapsedSeconds * 1e-0);
 		float FrameTime = 0;
 		float FPS = 0;
-		ImGui::LabelText("Frame Time (s) : ", "Frame  Time (s) : %f", FrameTime);
-		ImGui::LabelText("FPS : ", "FPS : %f",  FPS);
+		ImGui::LabelText("", "Frame  Time (s) : %f", FrameTime);
+		ImGui::LabelText("", "FPS : %f",  FPS);
 		
 		
 		
