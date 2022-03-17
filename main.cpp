@@ -5,12 +5,11 @@
 #endif
 #include"gc_3d_defs.hpp"
 #include"shader/shader.hpp"
-#define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
 #include "dep/imgui/imgui.h"
 #include "dep/imgui/backends/imgui_impl_opengl3.h"
 #include "dep/imgui/backends/imgui_impl_sdl.h"
-#include "stb.c"
+#include "stb.h"
+
 
 
 
@@ -69,13 +68,15 @@ int	main(int argc, char* argv[]){
 	int width, height, nrChannels;
 	unsigned char* data = stbi_load("D:/users/ppiglioni/projet6/images/UwU3.gif", &width, &height, &nrChannels, 0);
 
-	//unsigned char* data = stbi_xload_file("D:/users/ppiglioni/projet6/images/UwU3.gif",);
+	int x, y, frames;
+	int* delay;
+	unsigned char* data2 = stbi_xload_file("D:/users/ppiglioni/projet6/images/UwU3.gif",&x,&y,&frames,&delay);
 
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
-	if (data)
+	if (data2)
 	{
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data2);
 		glGenerateMipmap(GL_TEXTURE_2D);
 	}
 	else

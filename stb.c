@@ -48,10 +48,10 @@ extern "C" {
 		unsigned char* result = 0;
 
 		if (stbi__gif_test(s))
-			return stbi__load_gif_main(s, delays, x, y, frames, &comp, 4);
+			return (unsigned char*) stbi__load_gif_main(s, delays, x, y, frames, &comp, 4);
 
 		stbi__result_info ri;
-		result = stbi__load_main(s, x, y, &comp, 4, &ri, 8);
+		result = (unsigned char*) stbi__load_main(s, x, y, &comp, 4, &ri, 8);
 		*frames = !!result;
 
 		if (ri.bits_per_channel != 8) {
