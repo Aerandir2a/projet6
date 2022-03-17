@@ -15,6 +15,8 @@ include(CMake/glew.cmake)
 set(IMGUI_USE_OGL3 true)
 include(CMake/imgui.cmake)
 
+include(CMake/assimp.cmake)
+
 
 
 target_include_directories(moteur PRIVATE 
@@ -22,4 +24,5 @@ target_include_directories(moteur PRIVATE
 	${GLM_INCLUDE_DIR}
 	${IMGUI_INCLUDE_DIR}
 )
-target_link_libraries(moteur PRIVATE SDL2-static SDL2main opengl32 glew imgui)
+
+target_link_libraries(moteur PRIVATE SDL2-static SDL2main opengl32 glew imgui assimp)
