@@ -23,6 +23,10 @@ int	main(int argc, char* argv[]){
 
 	SDL_Window* win = SDL_CreateWindow("moteur",SDL_WINDOWPOS_UNDEFINED,SDL_WINDOWPOS_UNDEFINED,1024,768,windowFlags);
 
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_PROFILE_CORE);
+
 	SDL_GLContext context = SDL_GL_CreateContext(win);
 	SDL_GL_MakeCurrent(win, context);
 	glClearColor(0.0, 0.0, 0.4, 0.0);
@@ -51,32 +55,46 @@ int	main(int argc, char* argv[]){
 	GLuint MatrixID = glGetUniformLocation(programID, "MVP");
 
 	GLuint TextureID = glGetUniformLocation(programID, "myTextureSampler");
+	GLuint LayerID = glGetUniformLocation(programID, "layer");
 
 	GLuint Texture;
 	glGenTextures(1, &Texture);
-	glBindTexture(GL_TEXTURE_2D, Texture);
+	glBindTexture(GL_TEXTURE_2D_ARRAY, Texture);
+	
+	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
 	// set the texture wrapping/filtering options (on the currently bound texture object)
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	/*glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);*/
 
 	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_COMBINE);
 	glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_RGB, GL_MODULATE);
 	
 
-	int width, height, nrChannels;
-	unsigned char* data = stbi_load("D:/users/ppiglioni/projet6/images/UwU3.gif", &width, &height, &nrChannels, 0);
+	/*int width, height, nrChannels;
+	unsigned char* data = stbi_load("D:/users/ppiglioni/projet6/images/UwU2.jpg", &width, &height, &nrChannels, 0);*/
 
 	int x, y, frames;
 	int* delay;
-	unsigned char* data2 = stbi_xload_file("D:/users/ppiglioni/projet6/images/UwU3.gif",&x,&y,&frames,&delay);
+	unsigned char* data = stbi_xload_file("D:/users/ppiglioni/projet6/images/UwU3.gif",&x,&y,&frames,&delay);
+
+	int x2, y2, frames2;
+	int* delay2;
+	unsigned char* data2 = stbi_xload_file("D:/users/ppiglioni/projet6/images/rickroll_roll.gif", &x2, &y2, &frames2, &delay2);
 
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
-	if (data2)
+	if (data)
 	{
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data2);
+		//glTexStorage3D(GL_TEXTURE_2D_ARRAY, 1, GL_RGBA, x, y, frames);
+		//glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA,x, y, 0, GL_RGBA, GL_UNSIGNED_BYTE, data2);
+		//glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, 0, x, y, frames, GL_RGBA, GL_UNSIGNED_BYTE, data2);
+		glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGBA, x, y, frames ,0, GL_RGBA, GL_UNSIGNED_BYTE, data);
 		glGenerateMipmap(GL_TEXTURE_2D);
 	}
 	else
@@ -231,11 +249,16 @@ int	main(int argc, char* argv[]){
 	auto time = Clock::now();
 
 	bool appRunning = true;
+	int frameOfGif = frames;
 	while (appRunning) {
 		
 		SDL_Event curEvent;
 		while (SDL_PollEvent(&curEvent))
 		{
+			if (curEvent.type == SDL_QUIT || curEvent.key.keysym.sym == SDLK_ESCAPE) {
+				SDL_Quit();
+			}
+
 			ImGui_ImplSDL2_ProcessEvent(&curEvent);
 			if (!io.WantCaptureMouse)
 			{
@@ -257,7 +280,7 @@ int	main(int argc, char* argv[]){
 
 		// Bind our texture in Texture Unit 0
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, Texture);
+		glBindTexture(GL_TEXTURE_2D_ARRAY, Texture);
 		// Set our "myTextureSampler" sampler to use Texture Unit 0
 		glUniform1i(TextureID, 0);
 
@@ -267,12 +290,23 @@ int	main(int argc, char* argv[]){
 		ImGui::NewFrame();
 		
 		auto curTime = Clock::now();
-		std::chrono::duration<float> elapsedSeconds = curTime - time;
+		Duration elapsedSeconds = curTime - time;
+		float elapsedSecondsf = Seconds(elapsedSeconds);
 
 		ImGui::Begin("Perfs");
-		ImGui::LabelText("Frame Time (s) : ", "%f", elapsedSeconds * 1e-0);
-		ImGui::LabelText("FPS : ", "%f",  1 / elapsedSeconds.count());
+		/*ImGui::LabelText("Time from the beginning : ", "%f", elapsedSecondsf * 1e-0);
+		ImGui::LabelText("Frame from the beginning : ", "%f", elapsedSecondsf * 6e-2);
+		ImGui::LabelText("FPS : ", "%f",  1 / elapsedSecondsf);*/
+		if (ImGui::Button("Surprise!")) {
+			printf("\nsurprise!");
+			glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGBA, x2, y2, frames2, 0, GL_RGBA, GL_UNSIGNED_BYTE, data2);
+			frameOfGif = frames2;
+		}
 		ImGui::End();
+
+
+		glUniform1i(LayerID, int(elapsedSecondsf * 25) % frameOfGif);
+		
 
 		glEnableVertexAttribArray(0);
 		glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
@@ -298,7 +332,7 @@ int	main(int argc, char* argv[]){
 		);
 
 		// 2nd attribute buffer : UVs
-		glEnableVertexAttribArray(1);
+		glEnableVertexAttribArray(2);
 		glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
 		glVertexAttribPointer(
 			1,                                // attribute. No particular reason for 1, but must match the layout in the shader.
