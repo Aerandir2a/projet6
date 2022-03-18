@@ -133,12 +133,13 @@ bool loadAssImp(
 
 	Assimp::Importer importer;
 
-	const aiScene* scene = importer.ReadFile(path, 0/*aiProcess_JoinIdenticalVertices | aiProcess_SortByPType*/);
+	const aiScene* scene = importer.ReadFile(path, aiProcess_JoinIdenticalVertices | aiProcess_SortByPType | aiProcess_Triangulate);
 	if (!scene) {
 		fprintf(stderr, importer.GetErrorString());
 		getchar();
 		return false;
 	}
+	
 	const aiMesh* mesh = scene->mMeshes[0]; // In this simple example code we always use the 1rst mesh (in OBJ files there is often only one anyway)
 
 	// Fill vertices positions
