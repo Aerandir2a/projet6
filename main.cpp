@@ -81,11 +81,11 @@ int	main(int argc, char* argv[]){
 
 	int x, y, frames;
 	int* delay;
-	unsigned char* data = stbi_xload_file("D:/users/ppiglioni/projet6/images/UwU3.gif",&x,&y,&frames,&delay);
+	unsigned char* data = stbi_xload_file("D:/users/ppiglioni/projet6/images/out_disappear.gif",&x,&y,&frames,&delay);
 
 	int x2, y2, frames2;
 	int* delay2;
-	unsigned char* data2 = stbi_xload_file("D:/users/ppiglioni/projet6/images/rickroll_roll.gif", &x2, &y2, &frames2, &delay2);
+	unsigned char* data2 = stbi_xload_file("D:/users/ppiglioni/projet6/images/surprise_chris_pratt.gif", &x2, &y2, &frames2, &delay2);
 
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
@@ -250,14 +250,16 @@ int	main(int argc, char* argv[]){
 
 	bool appRunning = true;
 	int frameOfGif = frames;
+	int frame = 0;
+	int inAnimation = 1;
 	while (appRunning) {
 		
 		SDL_Event curEvent;
 		while (SDL_PollEvent(&curEvent))
 		{
-			if (curEvent.type == SDL_QUIT || curEvent.key.keysym.sym == SDLK_ESCAPE) {
+			/*if (curEvent.type == SDL_QUIT || curEvent.key.keysym.sym == SDLK_ESCAPE) {
 				SDL_Quit();
-			}
+			}*/
 
 			ImGui_ImplSDL2_ProcessEvent(&curEvent);
 			if (!io.WantCaptureMouse)
@@ -281,7 +283,7 @@ int	main(int argc, char* argv[]){
 		// Bind our texture in Texture Unit 0
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D_ARRAY, Texture);
-		// Set our "myTextureSampler" sampler to use Texture Unit 0
+		//Set our "myTextureSampler" sampler to use Texture Unit 0
 		glUniform1i(TextureID, 0);
 
 		ImGui_ImplOpenGL3_NewFrame();
@@ -304,8 +306,21 @@ int	main(int argc, char* argv[]){
 		}
 		ImGui::End();
 
+		/*if (frame >= frameOfGif && inAnimation == 1) {
+			frame = 0;
+			glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGBA, x2, y2, frames2, 0, GL_RGBA, GL_UNSIGNED_BYTE, data2);
+			frameOfGif = frames2;
+			inAnimation = 2;
+		}
+		else if (frame >= frameOfGif && inAnimation == 2) {
+			frame = 0;
+			glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGBA, x, y, frames, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+			frameOfGif = frames;
+			inAnimation = 1;
+		}*/
 
 		glUniform1i(LayerID, int(elapsedSecondsf * 25) % frameOfGif);
+		
 		
 
 		glEnableVertexAttribArray(0);

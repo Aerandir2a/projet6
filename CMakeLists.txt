@@ -6,7 +6,8 @@ add_executable(moteur main.cpp gc_3d_defs.hpp
 shader/shader.hpp shader/loadShader.cpp 
 shader/TranformVertexShader.vertexshader.txt shader/SimpleFragmentShader.fragmentshader.txt 
 stb_image.h stb.c stb.h
-images/UwU3.gif images/UwU2.jpg images/rickroll_roll.gif)
+images/UwU3.gif images/UwU2.jpg images/rickroll_roll.gif
+images/out_disappear.gif images/surprise_chris_pratt.gif)
 
 add_subdirectory(SDL dep/SDL)
 
