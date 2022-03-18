@@ -13,6 +13,8 @@ images/UwU2.jpg
 mesh.h
 shader/ModelShader.h
 glad/glad.h
+common/objloader.cpp
+common/objloader.hpp
 )
 
 add_subdirectory(SDL dep/SDL)

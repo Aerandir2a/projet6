@@ -11,6 +11,8 @@
 #include "dep/imgui/backends/imgui_impl_opengl3.h"
 #include "dep/imgui/backends/imgui_impl_sdl.h"
 
+#include "common/objloader.hpp"
+
 
 
 
@@ -47,14 +49,17 @@ int	main(int argc, char* argv[]){
 	GLuint programID = LoadShaders("C:/Users/lnicolas/Documents/GitHub/projet6/shader/TranformVertexShader.vertexshader.txt", "C:/Users/lnicolas/Documents/GitHub/projet6/shader/SimpleFragmentShader.fragmentshader.txt");
 	
 	//permet d'afficher la face avant mais pas la face derrière
-	glEnable(GL_CULL_FACE);
-	glCullFace(GL_FRONT);
+	///glEnable(GL_CULL_FACE);
+	///glCullFace(GL_FRONT);
+	
 	
 	// Get a handle for our "MVP" uniform
 	// Only during the initialisation
 	GLuint MatrixID = glGetUniformLocation(programID, "MVP");
 
 	GLuint TextureID = glGetUniformLocation(programID, "myTextureSampler");
+
+		
 
 	GLuint Texture;
 	glGenTextures(1, &Texture);
@@ -69,6 +74,15 @@ int	main(int argc, char* argv[]){
 	unsigned char* data = stbi_load("C:/Users/lnicolas/Documents/GitHub/projet6/images/portal.png", &width, &height, &nrChannels, 0);
 
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
+
+	// Read our .obj file
+	std::vector<unsigned short> indices;
+	std::vector< glm::vec3 > vertices;
+	std::vector< glm::vec2 > uvs;
+	std::vector< glm::vec3 > normals; // Won't be used at the moment.
+	bool res = loadAssImp("C:/Users/lnicolas/Documents/GitHub/projet6/objets3D/MonObjet.obj", indices, vertices, uvs, normals);
+
 
 	if (data)
 	{
@@ -101,128 +115,41 @@ int	main(int argc, char* argv[]){
 	mat4 Model = mat4(1.0f);
 	// Our ModelViewProjection : multiplication of our 3 matrices
 	mat4 MVP = Projection * View * Model; // Remember, matrix multiplication is the other way around
+	
+	
 
-	static const GLfloat g_vertex_buffer_data[] = {
-		-1.0f, -1.0f, 1.0f,-1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f,
-		1.0f, 1.0f, 1.0f,1.0f, -1.0f, 1.0f,-1.0f, -1.0f, 1.0f, // face avant
 
-		-1.0f, -1.0f, -1.0f, -1.0f, 1.0f, -1.0f, -1.0f, 1.0f, 1.0f,
-		-1.0f, 1.0f, 1.0f, -1.0f, -1.0f, 1.0f, -1.0f, -1.0f, -1.0f, // face gauche
+	
 
-		1.0f, -1.0f, -1.0f, 1.0f, 1.0f, -1.0f, -1.0f, 1.0f, -1.0f,
-		-1.0f, 1.0f, -1.0f, -1.0f, -1.0f, -1.0f, 1.0f, -1.0f, -1.0f, // face derrière
-
-		1.0f, -1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, -1.0f,
-		1.0f, 1.0f, -1.0f, 1.0f, -1.0f, -1.0f, 1.0f, -1.0f, 1.0f, // face droite
-
-		 -1.0f, 1.0f, 1.0f, -1.0f, 1.0f, -1.0f, 1.0f, 1.0f, -1.0f,
-		 1.0f, 1.0f, -1.0f, 1.0f, 1.0f, 1.0f, -1.0f, 1.0f, 1.0f, // face dessus
-
-		 -1.0f, -1.0f, -1.0f, -1.0f, -1.0f, 1.0f, 1.0f, -1.0f, 1.0f,
-		 1.0f, -1.0f, 1.0f, 1.0f, -1.0f, -1.0f, -1.0f, -1.0f, -1.0f, // face dessous
-	};
-
-	static const GLfloat g_color_buffer_data[] = {
-	0.583f,  0.771f,  0.014f,
-	0.609f,  0.115f,  0.436f,
-	0.327f,  0.483f,  0.844f,
-	0.822f,  0.569f,  0.201f,
-	0.435f,  0.602f,  0.223f,
-	0.310f,  0.747f,  0.185f,
-	0.597f,  0.770f,  0.761f,
-	0.559f,  0.436f,  0.730f,
-	0.359f,  0.583f,  0.152f,
-	0.483f,  0.596f,  0.789f,
-	0.559f,  0.861f,  0.639f,
-	0.195f,  0.548f,  0.859f,
-	0.014f,  0.184f,  0.576f,
-	0.771f,  0.328f,  0.970f,
-	0.406f,  0.615f,  0.116f,
-	0.676f,  0.977f,  0.133f,
-	0.971f,  0.572f,  0.833f,
-	0.140f,  0.616f,  0.489f,
-	0.997f,  0.513f,  0.064f,
-	0.945f,  0.719f,  0.592f,
-	0.543f,  0.021f,  0.978f,
-	0.279f,  0.317f,  0.505f,
-	0.167f,  0.620f,  0.077f,
-	0.347f,  0.857f,  0.137f,
-	0.055f,  0.953f,  0.042f,
-	0.714f,  0.505f,  0.345f,
-	0.783f,  0.290f,  0.734f,
-	0.722f,  0.645f,  0.174f,
-	0.302f,  0.455f,  0.848f,
-	0.225f,  0.587f,  0.040f,
-	0.517f,  0.713f,  0.338f,
-	0.053f,  0.959f,  0.120f,
-	0.393f,  0.621f,  0.362f,
-	0.673f,  0.211f,  0.457f,
-	0.820f,  0.883f,  0.371f,
-	0.982f,  0.099f,  0.879f
-	};
-
-	// Two UV coordinatesfor each vertex. They were created with Blender. You'll learn shortly how to do this yourself.
-	static const GLfloat g_uv_buffer_data[] = {
-		0.0f, 0.0f,// face avant
-		0.0f, 1.0f,
-		1.0f, 1.0f,
-		1.0f, 1.0f,
-		1.0f,0.0f,
-		0.0f, 0.0f,
-
-		0.0f, 0.0f,// face gauche
-		0.0f, 1.0f,
-		1.0f, 1.0f,
-		1.0f, 1.0f,
-		1.0f,0.0f,
-		0.0f, 0.0f,
-
-		0.0f, 0.0f,// face derrière
-		0.0f, 1.0f,
-		1.0f, 1.0f,
-		1.0f, 1.0f,
-		1.0f,0.0f,
-		0.0f, 0.0f,
-
-		0.0f, 0.0f,// face droite
-		0.0f, 1.0f,
-		1.0f, 1.0f,
-		1.0f, 1.0f,
-		1.0f,0.0f,
-		0.0f, 0.0f,
-
-		0.0f, 0.0f,// face dessus
-		0.0f, 1.0f,
-		1.0f, 1.0f,
-		1.0f, 1.0f,
-		1.0f,0.0f,
-		0.0f, 0.0f,
-
-		0.0f, 0.0f,// face dessous
-		0.0f, 1.0f,
-		1.0f, 1.0f,
-		1.0f, 1.0f,
-		1.0f,0.0f,
-		0.0f, 0.0f,
-	};
+	//buffer objet load
+	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec3), &vertices[0], GL_STATIC_DRAW);
+	
 
 	GLuint vertexbuffer;
-	// Generate 1 buffer, put the resulting identifier in vertexbuffer
 	glGenBuffers(1, &vertexbuffer);
-	// The following commands will talk about our 'vertexbuffer' buffer
 	glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
-	// Give our vertices to OpenGL.
-	glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec3), &vertices[0], GL_STATIC_DRAW);
+
+	
+
+	
+	
 
 	GLuint colorbuffer;
 	glGenBuffers(1, &colorbuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(g_color_buffer_data), g_color_buffer_data, GL_STATIC_DRAW);
+	//glBufferData(GL_ARRAY_BUFFER, sizeof(g_color_buffer_data), g_color_buffer_data, GL_STATIC_DRAW);
+	
+	
 
 	GLuint uvbuffer;
 	glGenBuffers(1, &uvbuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(g_uv_buffer_data), g_uv_buffer_data, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, uvs.size() * sizeof(glm::vec2), &uvs[0], GL_STATIC_DRAW);
+
+	
+	
+	
 
 	auto time = Clock::now();
 
@@ -280,7 +207,10 @@ int	main(int argc, char* argv[]){
 		
 		
 		
-		ImGui::Button("Click Button!");
+		if (ImGui::Button("Click Button!")) {
+			printf("Button clicked ");
+		}
+		
 
 		ImGui::End();
 
@@ -323,8 +253,8 @@ int	main(int argc, char* argv[]){
 		);
 
 		// Draw the triangle !
-		glDrawArrays(GL_TRIANGLES, 0, 12*3); // Starting from vertex 0; 3 vertices total -> 1 triangle
-		glDisableVertexAttribArray(0);	
+		glDrawArrays(GL_TRIANGLES, 0, vertices.size()); // Starting from vertex 0; 3 vertices total -> 1 triangle
+		glDisableVertexAttribArray(0);
 
 		
 
