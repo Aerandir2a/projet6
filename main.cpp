@@ -305,19 +305,6 @@ int	main(int argc, char* argv[]){
 		ImGui::LabelText("frame : ", "%i", frame);
 		if (ImGui::Button("Surprise!")) {
 			printf("\nsurprise!");
-			
-			if (inAnimation == 1) {
-				glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGBA, x2, y2, frames2, 0, GL_RGBA, GL_UNSIGNED_BYTE, data2);
-				frameOfGif = frames2;
-				inAnimation = 2;
-				
-			}
-			else if(inAnimation == 2){
-				glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGBA, x, y, frames, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-				frameOfGif = frames;
-				inAnimation = 1;
-				
-			}
 		}
 		ImGui::End();
 		
