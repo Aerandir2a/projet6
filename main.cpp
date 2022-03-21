@@ -83,6 +83,7 @@ int	main(int argc, char* argv[]){
 	int* delay;
 	unsigned char* data = stbi_xload_file("D:/users/ppiglioni/projet6/images/out_disappear.gif",&x,&y,&frames,&delay);
 
+
 	int x2, y2, frames2;
 	int* delay2;
 	unsigned char* data2 = stbi_xload_file("D:/users/ppiglioni/projet6/images/surprise_chris_pratt.gif", &x2, &y2, &frames2, &delay2);
@@ -247,6 +248,7 @@ int	main(int argc, char* argv[]){
 	glBufferData(GL_ARRAY_BUFFER, sizeof(g_uv_buffer_data), g_uv_buffer_data, GL_STATIC_DRAW);
 
 	auto time = Clock::now();
+	auto timergif = Clock::now();
 
 	bool appRunning = true;
 	int frameOfGif = frames;
@@ -299,27 +301,47 @@ int	main(int argc, char* argv[]){
 		/*ImGui::LabelText("Time from the beginning : ", "%f", elapsedSecondsf * 1e-0);
 		ImGui::LabelText("Frame from the beginning : ", "%f", elapsedSecondsf * 6e-2);
 		ImGui::LabelText("FPS : ", "%f",  1 / elapsedSecondsf);*/
+		ImGui::LabelText("Time : ", "%f", elapsedSecondsf);
+		ImGui::LabelText("frame : ", "%i", frame);
 		if (ImGui::Button("Surprise!")) {
 			printf("\nsurprise!");
-			glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGBA, x2, y2, frames2, 0, GL_RGBA, GL_UNSIGNED_BYTE, data2);
-			frameOfGif = frames2;
+			
+			if (inAnimation == 1) {
+				glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGBA, x2, y2, frames2, 0, GL_RGBA, GL_UNSIGNED_BYTE, data2);
+				frameOfGif = frames2;
+				inAnimation = 2;
+				
+			}
+			else if(inAnimation == 2){
+				glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGBA, x, y, frames, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+				frameOfGif = frames;
+				inAnimation = 1;
+				
+			}
 		}
 		ImGui::End();
+		
 
-		/*if (frame >= frameOfGif && inAnimation == 1) {
+		if (frame >= frameOfGif && inAnimation == 1) {
 			frame = 0;
 			glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGBA, x2, y2, frames2, 0, GL_RGBA, GL_UNSIGNED_BYTE, data2);
 			frameOfGif = frames2;
 			inAnimation = 2;
+			timergif = Clock::now();
 		}
 		else if (frame >= frameOfGif && inAnimation == 2) {
 			frame = 0;
 			glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGBA, x, y, frames, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
 			frameOfGif = frames;
 			inAnimation = 1;
-		}*/
+			timergif = Clock::now();
+		}
 
-		glUniform1i(LayerID, int(elapsedSecondsf * 25) % frameOfGif);
+		auto endTimerGif = Clock::now();
+		Duration timeForGif = endTimerGif - timergif;
+		frame = Seconds(timeForGif) / 0.06;
+		glUniform1i(LayerID, frame % frameOfGif);
+		//glUniform1i(LayerID,int(elapsedSecondsf * 25)% frameOfGif);
 		
 		
 
