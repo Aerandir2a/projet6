@@ -50,6 +50,8 @@ int	main(int argc, char* argv[]){
 
 
 
+
+
 	GLuint programID = LoadShaders("C:/Users/lnicolas/Documents/GitHub/projet6/shader/TranformVertexShader.vertexshader.txt", "C:/Users/lnicolas/Documents/GitHub/projet6/shader/SimpleFragmentShader.fragmentshader.txt");
 	
 	//permet d'afficher la face avant mais pas la face derrière
@@ -64,7 +66,8 @@ int	main(int argc, char* argv[]){
 	GLuint TextureID = glGetUniformLocation(programID, "myTextureSampler");
 
 		
-
+	/*
+	
 	GLuint Texture;
 	glGenTextures(1, &Texture);
 	glBindTexture(GL_TEXTURE_2D, Texture);
@@ -75,9 +78,21 @@ int	main(int argc, char* argv[]){
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	// load and generate the texture
 	int width, height, nrChannels;
-	unsigned char* data = stbi_load("C:/Users/lnicolas/Documents/GitHub/projet6/images/white.png", &width, &height, &nrChannels, 0);
+	unsigned char* data = stbi_load("C:/Users/lnicolas/Documents/GitHub/projet6/images/portal.png", &width, &height, &nrChannels, 0);
 
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
+
+	if (data)
+	{
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+		glGenerateMipmap(GL_TEXTURE_2D);
+	}
+	else
+	{
+		std::cout << "Failed to load texture" << std::endl;
+	}
+	*/
 
 
 
@@ -99,15 +114,7 @@ int	main(int argc, char* argv[]){
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementbuffer);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned short), indices.data(), GL_STATIC_DRAW);
 
-	if (data)
-	{
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-		glGenerateMipmap(GL_TEXTURE_2D);
-	}
-	else
-	{
-		std::cout << "Failed to load texture" << std::endl;
-	}
+	
 
 	GLuint VertexArrayID;
 	glGenVertexArrays(1, &VertexArrayID);
@@ -142,7 +149,7 @@ int	main(int argc, char* argv[]){
 	GLuint colorbuffer;
 	glGenBuffers(1, &colorbuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
-	//glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(g_color_buffer_data), g_color_buffer_data, GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec3), vertices.data(), GL_STATIC_DRAW);
 	
 
 	GLuint uvbuffer;
@@ -181,11 +188,14 @@ int	main(int argc, char* argv[]){
 		// This is done in the main loop since each model will have a different MVP matrix (At least for the M part)
 		glUniformMatrix4fv(MatrixID, 1, GL_FALSE, value_ptr(MVP));
 
+		/*
+
 		// Bind our texture in Texture Unit 0
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, Texture);
 		// Set our "myTextureSampler" sampler to use Texture Unit 0
 		glUniform1i(TextureID, 0);
+		*/
 
 
 
@@ -231,19 +241,29 @@ int	main(int argc, char* argv[]){
 		);
 
 		// 2nd attribute buffer : colors
-		//glEnableVertexAttribArray(1);
-		//glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
-		//glVertexAttribPointer(
-		//	1,                                // attribute. No particular reason for 1, but must match the layout in the shader.
-		//	3,                                // size
-		//	GL_FLOAT,                         // type
-		//	GL_FALSE,                         // normalized?
-		//	0,                                // stride
-		//	(void*)0                          // array buffer offset
-		//);
-
-		// 2nd attribute buffer : UVs
 		glEnableVertexAttribArray(1);
+		glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
+		glVertexAttribPointer(
+			1,                                // attribute. No particular reason for 1, but must match the layout in the shader.
+			3,                                // size
+			GL_FLOAT,                         // type
+			GL_FALSE,                         // normalized?
+			0,                                // stride
+			(void*)0                          // array buffer offset
+		);
+
+		// Enable depth test
+		glEnable(GL_DEPTH_TEST);
+		// Accept fragment if it closer to the camera than the former one
+		glDepthFunc(GL_LESS);
+
+		// Clear the screen
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		
+
+		// 3nd attribute buffer : UVs
+		glEnableVertexAttribArray(2);
 		glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
 		glVertexAttribPointer(
 			1,                                // attribute. No particular reason for 1, but must match the layout in the shader.
