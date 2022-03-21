@@ -149,12 +149,15 @@ bool loadAssImp(
 		vertices.push_back(glm::vec3(pos.x, pos.y, pos.z));
 	}
 
+
 	// Fill vertices texture coordinates
 	uvs.reserve(mesh->mNumVertices);
+	
 	for (unsigned int i = 0; i < mesh->mNumVertices; i++) {
 		aiVector3D UVW = mesh->mTextureCoords[0][i]; // Assume only 1 set of UV coords; AssImp supports 8 UV sets.
 		uvs.push_back(glm::vec2(UVW.x, UVW.y));
 	}
+	
 
 	// Fill vertices normals
 	normals.reserve(mesh->mNumVertices);

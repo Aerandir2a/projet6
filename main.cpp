@@ -106,7 +106,7 @@ int	main(int argc, char* argv[]){
 	std::vector< glm::vec3 > vertices;
 	std::vector< glm::vec2 > uvs;
 	std::vector< glm::vec3 > normals; // Won't be used at the moment.
-	bool res = loadAssImp("C:/Users/lnicolas/Documents/GitHub/projet6/objets3D/MonObjet.obj", indices, vertices, uvs, normals);
+	bool res = loadAssImp("C:/Users/lnicolas/Documents/GitHub/projet6/objets3D/FrogUV.fbx", indices, vertices, uvs, normals);
 
 	// Generate a buffer for the indices
 	GLuint elementbuffer;
