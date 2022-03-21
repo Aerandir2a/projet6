@@ -81,12 +81,16 @@ int	main(int argc, char* argv[]){
 
 	int x, y, frames;
 	int* delay;
-	unsigned char* data = stbi_xload_file("D:/users/ppiglioni/projet6/images/out_disappear.gif",&x,&y,&frames,&delay);
+	unsigned char* data = stbi_xload_file("D:/users/ppiglioni/projet6/images/Double_sun_power.gif",&x,&y,&frames,&delay);
 
 
 	int x2, y2, frames2;
 	int* delay2;
-	unsigned char* data2 = stbi_xload_file("D:/users/ppiglioni/projet6/images/surprise_chris_pratt.gif", &x2, &y2, &frames2, &delay2);
+	unsigned char* data2 = stbi_xload_file("D:/users/ppiglioni/projet6/images/Mmmh_sun.gif", &x2, &y2, &frames2, &delay2);
+
+	int x3, y3, frames3;
+	int* delay3;
+	unsigned char* data3 = stbi_xload_file("D:/users/ppiglioni/projet6/images/rickroll_roll.gif", &x3, &y3, &frames3, &delay3);
 
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
@@ -305,10 +309,13 @@ int	main(int argc, char* argv[]){
 		ImGui::LabelText("frame : ", "%i", frame);
 		if (ImGui::Button("Surprise!")) {
 			printf("\nsurprise!");
+			timergif = Clock::now();
+			glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGBA, x3, y3, frames3, 0, GL_RGBA, GL_UNSIGNED_BYTE, data3);
+			frameOfGif = frames3;
+			frame = 0;
 		}
 		ImGui::End();
 		
-
 		if (frame >= frameOfGif && inAnimation == 1) {
 			frame = 0;
 			glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGBA, x2, y2, frames2, 0, GL_RGBA, GL_UNSIGNED_BYTE, data2);
@@ -327,7 +334,7 @@ int	main(int argc, char* argv[]){
 		auto endTimerGif = Clock::now();
 		Duration timeForGif = endTimerGif - timergif;
 		frame = Seconds(timeForGif) / 0.06;
-		glUniform1i(LayerID, frame % frameOfGif);
+		glUniform1i(LayerID, frame);
 		//glUniform1i(LayerID,int(elapsedSecondsf * 25)% frameOfGif);
 		
 		
@@ -381,6 +388,8 @@ int	main(int argc, char* argv[]){
 		//Swap window as usual
 		SDL_GL_SwapWindow(win);
 	}
+
+
 
 	return 0;
 }
