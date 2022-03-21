@@ -6,7 +6,7 @@
 	url = https://github.com/g-truc/glm.git
 [submodule "dep/imgui"]
 	path = dep/imgui
-	url = https://github.com/ocornut/imgui
+	url = https://github.com/ocornut/imgui.git
 [submodule "dep/assimp"]
 	path = dep/assimp
 	url = https://github.com/assimp/assimp.git
