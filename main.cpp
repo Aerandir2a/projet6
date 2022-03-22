@@ -129,7 +129,7 @@ int	main(int argc, char* argv[]){
 	// Our ModelViewProjection : multiplication of our 3 matrices
 	mat4 MVP = Projection * View * Model; // Remember, matrix multiplication is the other way around
 
-	static const GLfloat g_vertex_buffer_data[] = {
+	GLfloat g_vertex_buffer_data[] = {
 		-1.0f, -1.0f, 1.0f, -1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f,
 		1.0f, 1.0f, 1.0f,1.0f, -1.0f, 1.0f,-1.0f, -1.0f, 1.0f, // face avant
 
@@ -147,6 +147,11 @@ int	main(int argc, char* argv[]){
 
 		 -1.0f, -1.0f, -1.0f, -1.0f, -1.0f, 1.0f, 1.0f, -1.0f, 1.0f,
 		 1.0f, -1.0f, 1.0f, 1.0f, -1.0f, -1.0f, -1.0f, -1.0f, -1.0f, // face dessous
+	};
+
+	static const GLfloat g_vertex_buffer_data2[] = {
+		-1.0, -1.0, -2.0, -1.0, 1.0, -2.0, 1.0, 1.0, -2.0,
+		1.0, 1.0, -2.0, 1.0, -1.0, -2.0, -1.0, -1.0, -2.0
 	};
 
 	static const GLfloat g_color_buffer_data[] = {
@@ -233,6 +238,11 @@ int	main(int argc, char* argv[]){
 		0.0f, 1.0f,
 	};
 
+	static const GLfloat g_uv_buffer_data2[] = {
+		0.0, 1.0, 0.0, 0.0, 1.0, 0.0,
+		1.0, 0.0, 1.0, 1.0, 0.0, 1.0
+	};
+
 	GLuint vertexbuffer;
 	// Generate 1 buffer, put the resulting identifier in vertexbuffer
 	glGenBuffers(1, &vertexbuffer);
@@ -240,6 +250,11 @@ int	main(int argc, char* argv[]){
 	glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
 	// Give our vertices to OpenGL.
 	glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
+
+	GLuint vertexbuffer2;
+	glGenBuffers(1, &vertexbuffer2);
+	glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer2);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data2), g_vertex_buffer_data2, GL_STATIC_DRAW);
 
 	GLuint colorbuffer;
 	glGenBuffers(1, &colorbuffer);
@@ -250,6 +265,11 @@ int	main(int argc, char* argv[]){
 	glGenBuffers(1, &uvbuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(g_uv_buffer_data), g_uv_buffer_data, GL_STATIC_DRAW);
+
+	GLuint uvbuffer2;
+	glGenBuffers(1, &uvbuffer2);
+	glBindBuffer(GL_ARRAY_BUFFER, uvbuffer2);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(g_uv_buffer_data2), g_uv_buffer_data2, GL_STATIC_DRAW);
 
 	auto time = Clock::now();
 	auto timergif = Clock::now();
@@ -351,7 +371,7 @@ int	main(int argc, char* argv[]){
 		);
 
 		// 2nd attribute buffer : colors
-		glEnableVertexAttribArray(1);
+		/*glEnableVertexAttribArray(1);
 		glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
 		glVertexAttribPointer(
 			1,                                // attribute. No particular reason for 1, but must match the layout in the shader.
@@ -360,10 +380,10 @@ int	main(int argc, char* argv[]){
 			GL_FALSE,                         // normalized?
 			0,                                // stride
 			(void*)0                          // array buffer offset
-		);
+		);*/
 
 		// 2nd attribute buffer : UVs
-		glEnableVertexAttribArray(2);
+		glEnableVertexAttribArray(1);
 		glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
 		glVertexAttribPointer(
 			1,                                // attribute. No particular reason for 1, but must match the layout in the shader.
@@ -376,6 +396,41 @@ int	main(int argc, char* argv[]){
 
 		// Draw the triangle !
 		glDrawArrays(GL_TRIANGLES, 0, 12*3); // Starting from vertex 0; 3 vertices total -> 1 triangle
+
+		for (int i = 0; i < sizeof(g_vertex_buffer_data); i++) {
+			if (0 == (i + 1) % 3) {
+				g_vertex_buffer_data[i] = g_vertex_buffer_data[i] - 3.0;
+			}
+		}
+
+		glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
+
+		glEnableVertexAttribArray(0);
+		glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
+		glVertexAttribPointer(
+			0,                  // attribute 0. No particular reason for 0, but must match the layout in the shader.
+			3,                  // size
+			GL_FLOAT,           // type
+			GL_FALSE,           // normalized?
+			0,                  // stride
+			(void*)0            // array buffer offset
+		);
+
+		// 2nd attribute buffer : UVs
+		glEnableVertexAttribArray(1);
+		glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
+		glVertexAttribPointer(
+			1,                                // attribute. No particular reason for 1, but must match the layout in the shader.
+			2,                                // size : U+V => 2
+			GL_FLOAT,                         // type
+			GL_FALSE,                         // normalized?
+			0,                                // stride
+			(void*)0                          // array buffer offset
+		);
+
+		// Draw the triangle !
+		glDrawArrays(GL_TRIANGLES, 0, 2 * 3); // Starting from vertex 0; 3 vertices total -> 1 triangle*/
 		glDisableVertexAttribArray(0);	
 
 		//... App rendering
