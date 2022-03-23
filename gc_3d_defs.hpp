@@ -8,7 +8,6 @@
 #include <vector>;
 #include <SDL_opengl.h>
 
-#include "common/objloader.hpp"
 
 
 namespace GC_3D

@@ -5,7 +5,7 @@
 
 #include <glm/glm.hpp>
 
-#include "objloader.hpp"
+#include "../header/objloader.hpp"
 
 // Include AssImp
 #include <assimp/Importer.hpp>      // C++ importer interface

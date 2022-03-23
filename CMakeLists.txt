@@ -8,13 +8,13 @@ shader/shader.hpp
 shader/loadShader.cpp
 shader/TranformVertexShader.vertexshader.txt
 shader/SimpleFragmentShader.fragmentshader.txt
-stb_image.h images/UwU.jpg
+header/stb_image.h
+images/UwU.jpg
 images/UwU2.jpg
-mesh.h
 shader/ModelShader.h
 glad/glad.h
-common/objloader.cpp
-common/objloader.hpp
+src/objloader.cpp
+header/objloader.hpp
 )
 
 add_subdirectory(SDL dep/SDL)

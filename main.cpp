@@ -6,12 +6,12 @@
 #include"gc_3d_defs.hpp"
 #include"shader/shader.hpp"
 #define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
+#include "header/stb_image.h"
 #include "dep/imgui/imgui.h"
 #include "dep/imgui/backends/imgui_impl_opengl3.h"
 #include "dep/imgui/backends/imgui_impl_sdl.h"
 
-#include "common/objloader.hpp"
+#include "header/objloader.hpp"
 
 
 
