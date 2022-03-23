@@ -9,6 +9,7 @@
 #include "dep/imgui/backends/imgui_impl_opengl3.h"
 #include "dep/imgui/backends/imgui_impl_sdl.h"
 #include "stb.h"
+#include "Texture.hpp"
 
 
 
@@ -57,55 +58,59 @@ int	main(int argc, char* argv[]){
 	GLuint TextureID = glGetUniformLocation(programID, "myTextureSampler");
 	GLuint LayerID = glGetUniformLocation(programID, "layer");
 
-	GLuint Texture;
-	glGenTextures(1, &Texture);
-	glBindTexture(GL_TEXTURE_2D_ARRAY, Texture);
-	
-	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	Texture t1;
 
-	// set the texture wrapping/filtering options (on the currently bound texture object)
-	/*glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);*/
+	t1.LoadTexture2D("D:/users/ppiglioni/projet6/images/UwU2.jpg");
 
-	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_COMBINE);
-	glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_RGB, GL_MODULATE);
-	
-
-	/*int width, height, nrChannels;
-	unsigned char* data = stbi_load("D:/users/ppiglioni/projet6/images/UwU2.jpg", &width, &height, &nrChannels, 0);*/
-
-	int x, y, frames;
-	int* delay;
-	unsigned char* data = stbi_xload_file("D:/users/ppiglioni/projet6/images/Double_sun_power.gif",&x,&y,&frames,&delay);
-
-
-	int x2, y2, frames2;
-	int* delay2;
-	unsigned char* data2 = stbi_xload_file("D:/users/ppiglioni/projet6/images/Mmmh_sun.gif", &x2, &y2, &frames2, &delay2);
-
-	int x3, y3, frames3;
-	int* delay3;
-	unsigned char* data3 = stbi_xload_file("D:/users/ppiglioni/projet6/images/rickroll_roll.gif", &x3, &y3, &frames3, &delay3);
-
-	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-
-	if (data)
-	{
-		//glTexStorage3D(GL_TEXTURE_2D_ARRAY, 1, GL_RGBA, x, y, frames);
-		//glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA,x, y, 0, GL_RGBA, GL_UNSIGNED_BYTE, data2);
-		//glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, 0, x, y, frames, GL_RGBA, GL_UNSIGNED_BYTE, data2);
-		glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGBA, x, y, frames ,0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-		glGenerateMipmap(GL_TEXTURE_2D);
-	}
-	else
-	{
-		std::cout << "Failed to load texture" << std::endl;
-	}
+	//GLuint Texture;
+	//glGenTextures(1, &Texture);
+	//glBindTexture(GL_TEXTURE_2D_ARRAY, Texture);
+	//
+	//glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	//glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	//glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	//glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	//
+	//// set the texture wrapping/filtering options (on the currently bound texture object)
+	////glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	////glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	////glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	////glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	//
+	//glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_COMBINE);
+	//glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_RGB, GL_MODULATE);
+	//
+	//
+	//int width, height, nrChannels;
+	////unsigned char* data = stbi_load("D:/users/ppiglioni/projet6/images/UwU2.jpg", &width, &height, &nrChannels, 0);
+	//
+	//int x, y, frames;
+	//int* delay;
+	//unsigned char* data = stbi_xload_file("D:/users/ppiglioni/projet6/images/Double_sun_power.gif",&x,&y,&frames,&delay);
+	//
+	//
+	//int x2, y2, frames2;
+	//int* delay2;
+	//unsigned char* data2 = stbi_xload_file("D:/users/ppiglioni/projet6/images/Mmmh_sun.gif", &x2, &y2, &frames2, &delay2);
+	//
+	//int x3, y3, frames3;
+	//int* delay3;
+	//unsigned char* data3 = stbi_xload_file("D:/users/ppiglioni/projet6/images/rickroll_roll.gif", &x3, &y3, &frames3, &delay3);
+	//
+	//glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+	//
+	//if (data)
+	//{
+	//	//glTexStorage3D(GL_TEXTURE_2D_ARRAY, 1, GL_RGBA, x, y, frames);
+	//	//glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+	//	//glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, 0, x, y, frames, GL_RGBA, GL_UNSIGNED_BYTE, data2);
+	//	glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGBA, x, y, frames ,0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+	//	glGenerateMipmap(GL_TEXTURE_2D_ARRAY);
+	//}
+	//else
+	//{
+	//	std::cout << "Failed to load texture" << std::endl;
+	//}
 
 	GLuint VertexArrayID;
 	glGenVertexArrays(1, &VertexArrayID);
@@ -149,7 +154,7 @@ int	main(int argc, char* argv[]){
 		 1.0f, -1.0f, 1.0f, 1.0f, -1.0f, -1.0f, -1.0f, -1.0f, -1.0f, // face dessous
 	};
 
-	static const GLfloat g_vertex_buffer_data2[] = {
+	GLfloat g_vertex_buffer_data2[] = {
 		-1.0, -1.0, -2.0, -1.0, 1.0, -2.0, 1.0, 1.0, -2.0,
 		1.0, 1.0, -2.0, 1.0, -1.0, -2.0, -1.0, -1.0, -2.0
 	};
@@ -238,11 +243,6 @@ int	main(int argc, char* argv[]){
 		0.0f, 1.0f,
 	};
 
-	static const GLfloat g_uv_buffer_data2[] = {
-		0.0, 1.0, 0.0, 0.0, 1.0, 0.0,
-		1.0, 0.0, 1.0, 1.0, 0.0, 1.0
-	};
-
 	GLuint vertexbuffer;
 	// Generate 1 buffer, put the resulting identifier in vertexbuffer
 	glGenBuffers(1, &vertexbuffer);
@@ -266,16 +266,11 @@ int	main(int argc, char* argv[]){
 	glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(g_uv_buffer_data), g_uv_buffer_data, GL_STATIC_DRAW);
 
-	GLuint uvbuffer2;
-	glGenBuffers(1, &uvbuffer2);
-	glBindBuffer(GL_ARRAY_BUFFER, uvbuffer2);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(g_uv_buffer_data2), g_uv_buffer_data2, GL_STATIC_DRAW);
-
 	auto time = Clock::now();
 	auto timergif = Clock::now();
 
 	bool appRunning = true;
-	int frameOfGif = frames;
+	//int frameOfGif = frames;
 	int frame = 0;
 	int inAnimation = 1;
 	while (appRunning) {
@@ -308,7 +303,7 @@ int	main(int argc, char* argv[]){
 
 		// Bind our texture in Texture Unit 0
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D_ARRAY, Texture);
+		glBindTexture(GL_TEXTURE_2D, t1.texture);
 		//Set our "myTextureSampler" sampler to use Texture Unit 0
 		glUniform1i(TextureID, 0);
 
@@ -328,29 +323,29 @@ int	main(int argc, char* argv[]){
 		ImGui::LabelText("Time : ", "%f", elapsedSecondsf);
 		ImGui::LabelText("frame : ", "%i", frame);
 		if (ImGui::Button("Surprise!")) {
-			printf("\nsurprise!");
-			timergif = Clock::now();
-			glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGBA, x3, y3, frames3, 0, GL_RGBA, GL_UNSIGNED_BYTE, data3);
-			frameOfGif = frames3;
-			frame = 0;
+			//printf("\nsurprise!");
+			//timergif = Clock::now();
+			//glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGBA, x3, y3, frames3, 0, GL_RGBA, GL_UNSIGNED_BYTE, data3);
+			//frameOfGif = frames3;
+			//frame = 0;
 		}
 		ImGui::End();
 		
-		if (frame >= frameOfGif && inAnimation == 1) {
-			frame = 0;
-			glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGBA, x2, y2, frames2, 0, GL_RGBA, GL_UNSIGNED_BYTE, data2);
-			frameOfGif = frames2;
-			inAnimation = 2;
-			timergif = Clock::now();
-		}
-		else if (frame >= frameOfGif && inAnimation == 2) {
-			frame = 0;
-			glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGBA, x, y, frames, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-			frameOfGif = frames;
-			inAnimation = 1;
-			timergif = Clock::now();
-		}
-
+		//if (frame >= frameOfGif && inAnimation == 1) {
+		//	frame = 0;
+		//	glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGBA, x2, y2, frames2, 0, GL_RGBA, GL_UNSIGNED_BYTE, data2);
+		//	frameOfGif = frames2;
+		//	inAnimation = 2;
+		//	timergif = Clock::now();
+		//}
+		//else if (frame >= frameOfGif && inAnimation == 2) {
+		//	frame = 0;
+		//	glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGBA, x, y, frames, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+		//	frameOfGif = frames;
+		//	inAnimation = 1;
+		//	timergif = Clock::now();
+		//}
+		
 		auto endTimerGif = Clock::now();
 		Duration timeForGif = endTimerGif - timergif;
 		frame = Seconds(timeForGif) / 0.06;
@@ -370,18 +365,6 @@ int	main(int argc, char* argv[]){
 			(void*)0            // array buffer offset
 		);
 
-		// 2nd attribute buffer : colors
-		/*glEnableVertexAttribArray(1);
-		glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
-		glVertexAttribPointer(
-			1,                                // attribute. No particular reason for 1, but must match the layout in the shader.
-			3,                                // size
-			GL_FLOAT,                         // type
-			GL_FALSE,                         // normalized?
-			0,                                // stride
-			(void*)0                          // array buffer offset
-		);*/
-
 		// 2nd attribute buffer : UVs
 		glEnableVertexAttribArray(1);
 		glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
@@ -397,17 +380,53 @@ int	main(int argc, char* argv[]){
 		// Draw the triangle !
 		glDrawArrays(GL_TRIANGLES, 0, 12*3); // Starting from vertex 0; 3 vertices total -> 1 triangle
 
-		for (int i = 0; i < sizeof(g_vertex_buffer_data); i++) {
+		/*for (int j = 0; j < 20; j++) {
+			if (j == 0) {
+				glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
+				glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
+
+				glEnableVertexAttribArray(0);
+				glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
+				glVertexAttribPointer(
+					0,                  // attribute 0. No particular reason for 0, but must match the layout in the shader.
+					3,                  // size
+					GL_FLOAT,           // type
+					GL_FALSE,           // normalized?
+					0,                  // stride
+					(void*)0            // array buffer offset
+				);
+
+				// 2nd attribute buffer : UVs
+				glEnableVertexAttribArray(1);
+				glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
+				glVertexAttribPointer(
+					1,                                // attribute. No particular reason for 1, but must match the layout in the shader.
+					2,                                // size : U+V => 2
+					GL_FLOAT,                         // type
+					GL_FALSE,                         // normalized?
+					0,                                // stride
+					(void*)0                          // array buffer offset
+				);
+
+				// Draw the triangle !
+				glDrawArrays(GL_TRIANGLES, 0, 12 * 3);
+			}
+			else {
+
+			}
+		}
+
+		/*for (int i = 0; i < sizeof(g_vertex_buffer_data) / 4; i++) {
 			if (0 == (i + 1) % 3) {
 				g_vertex_buffer_data[i] = g_vertex_buffer_data[i] - 3.0;
 			}
 		}
 
-		glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
+		glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer2);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data2), g_vertex_buffer_data2, GL_STATIC_DRAW);
 
 		glEnableVertexAttribArray(0);
-		glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
+		glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer2);
 		glVertexAttribPointer(
 			0,                  // attribute 0. No particular reason for 0, but must match the layout in the shader.
 			3,                  // size
@@ -433,8 +452,6 @@ int	main(int argc, char* argv[]){
 		glDrawArrays(GL_TRIANGLES, 0, 2 * 3); // Starting from vertex 0; 3 vertices total -> 1 triangle*/
 		glDisableVertexAttribArray(0);	
 
-		//... App rendering
-
 		//Rendering end
 
 		ImGui::Render();
@@ -443,8 +460,6 @@ int	main(int argc, char* argv[]){
 		//Swap window as usual
 		SDL_GL_SwapWindow(win);
 	}
-
-
 
 	return 0;
 }
