@@ -100,7 +100,17 @@ int	main(int argc, char* argv[]){
 	// fill "indices" as needed
 
 
+	/*
+	// Read our .obj file
+	std::vector<unsigned short> indices;
+	std::vector< glm::vec3 > vertices;
+	std::vector< glm::vec2 > uvs;
+	std::vector< glm::vec3 > normals; // Won't be used at the moment.
+	bool res = loadAssImp("C:/Users/lnicolas/Documents/GitHub/projet6/objets3D/FrogUV.fbx", indices, vertices, uvs, normals);
+	*/
 
+	
+	
 	// Read our .obj file
 	std::vector<unsigned short> indices;
 	std::vector< glm::vec3 > vertices;
@@ -113,6 +123,7 @@ int	main(int argc, char* argv[]){
 	glGenBuffers(1, &elementbuffer);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementbuffer);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned short), indices.data(), GL_STATIC_DRAW);
+	
 
 	
 
@@ -277,6 +288,8 @@ int	main(int argc, char* argv[]){
 		// Draw the triangle !
 		//glDrawArrays(GL_TRIANGLES, 0, indices.size()); // Starting from vertex 0; 3 vertices total -> 1 triangle
 		//glDisableVertexAttribArray(0);
+	
+		
 
 		// Index buffer
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementbuffer);
@@ -288,8 +301,6 @@ int	main(int argc, char* argv[]){
 			GL_UNSIGNED_SHORT,   // type
 			(void*)0           // element array buffer offset
 		);
-
-		
 
 		//Render ImGui
 		ImGui::Render();
