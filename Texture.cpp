@@ -1,6 +1,6 @@
 #include <GL/glew.h>
 #include "Texture.hpp"
-#include "stb.h"
+
 
 void Texture::LoadTextureGif(char* path) {
 
@@ -15,15 +15,13 @@ void Texture::LoadTextureGif(char* path) {
 	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_COMBINE);
 	glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_RGB, GL_MODULATE);
 
-	int x, y, frames;
-	int* delay;
-	unsigned char* data = stbi_xload_file(path, &x, &y, &frames, &delay);
+	A1.LoadGif(path);
 
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
-	if (data)
+	if (A1.data)
 	{
-		glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGBA, x, y, frames, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+		glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGBA, A1.x, A1.y, A1.frames, 0, GL_RGBA, GL_UNSIGNED_BYTE, A1.data);
 		glGenerateMipmap(GL_TEXTURE_2D);
 	}
 }
@@ -37,13 +35,19 @@ void Texture::LoadTexture2D(char* path) {
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
-	int width, height, nrChannels;
-	unsigned char* data = stbi_load(path, &width, &height, &nrChannels, 0);
+	A1.Load2D(path);
 
-	if (data)
+	if (A1.data)
 	{
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+		if (A1.nrChannels == 3) {
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, A1.x, A1.y, 0, GL_RGB, GL_UNSIGNED_BYTE, A1.data);
+		}
+		else if(A1.nrChannels == 4){
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, A1.x, A1.y, 0, GL_RGBA, GL_UNSIGNED_BYTE, A1.data);
+		}
 		glGenerateMipmap(GL_TEXTURE_2D);
 	}
 }
