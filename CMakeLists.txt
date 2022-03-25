@@ -15,6 +15,12 @@ shader/ModelShader.h
 glad/glad.h
 src/objloader.cpp
 header/objloader.hpp
+header/buffer.hpp
+header/camera.hpp
+header/controls.hpp
+src/buffer.cpp
+src/camera.cpp
+src/controls.cpp
 )
 
 add_subdirectory(SDL dep/SDL)

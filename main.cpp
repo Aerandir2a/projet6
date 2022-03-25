@@ -7,6 +7,9 @@
 #include"shader/shader.hpp"
 #define STB_IMAGE_IMPLEMENTATION
 #include "header/stb_image.h"
+//#include "header/buffer.hpp"
+#include "header/controls.hpp"
+#include "header/camera.hpp"
 #include "dep/imgui/imgui.h"
 #include "dep/imgui/backends/imgui_impl_opengl3.h"
 #include "dep/imgui/backends/imgui_impl_sdl.h"
@@ -19,12 +22,12 @@
 
 using namespace GC_3D;
 
-int	main(int argc, char* argv[]){
+int	main(int argc, char* argv[]) {
 	SDL_Init(SDL_INIT_VIDEO);
 
 	uint32_t windowFlags = SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE;
 
-	SDL_Window* win = SDL_CreateWindow("moteur",SDL_WINDOWPOS_UNDEFINED,SDL_WINDOWPOS_UNDEFINED,1024,768,windowFlags);
+	SDL_Window* win = SDL_CreateWindow("moteur", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 1024, 768, windowFlags);
 
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
@@ -52,22 +55,23 @@ int	main(int argc, char* argv[]){
 
 
 
-	GLuint programID = LoadShaders("C:/Users/lnicolas/Documents/GitHub/projet6/shader/TranformVertexShader.vertexshader.txt", "C:/Users/lnicolas/Documents/GitHub/projet6/shader/SimpleFragmentShader.fragmentshader.txt");
-	
+	//GLuint programID = LoadShaders("C:/Users/lnicolas/Documents/GitHub/projet6/shader/TranformVertexShader.vertexshader.txt", "C:/Users/lnicolas/Documents/GitHub/projet6/shader/SimpleFragmentShader.fragmentshader.txt");
+	GLuint programID = LoadShaders("D:/LapendryFlorian/GitHub/projet6/shader/TranformVertexShader.vertexshader.txt", "D:/LapendryFlorian/GitHub/projet6/shader/SimpleFragmentShader.fragmentshader.txt");
+
 	//permet d'afficher la face avant mais pas la face derrière
-	///glEnable(GL_CULL_FACE);
-	///glCullFace(GL_FRONT);
-	
-	
+	//glEnable(GL_CULL_FACE);
+	//glCullFace(GL_FRONT);
+
+
 	// Get a handle for our "MVP" uniform
 	// Only during the initialisation
-	GLuint MatrixID = glGetUniformLocation(programID, "MVP");
+	//GLuint MatrixID = glGetUniformLocation(programID, "MVP");
 
 	GLuint TextureID = glGetUniformLocation(programID, "myTextureSampler");
 
-		
+
 	/*
-	
+
 	GLuint Texture;
 	glGenTextures(1, &Texture);
 	glBindTexture(GL_TEXTURE_2D, Texture);
@@ -109,28 +113,29 @@ int	main(int argc, char* argv[]){
 	bool res = loadAssImp("C:/Users/lnicolas/Documents/GitHub/projet6/objets3D/FrogUV.fbx", indices, vertices, uvs, normals);
 	*/
 
-	
-	
+
+
 	// Read our .obj file
 	std::vector<unsigned short> indices;
 	std::vector< glm::vec3 > vertices;
 	std::vector< glm::vec2 > uvs;
 	std::vector< glm::vec3 > normals; // Won't be used at the moment.
-	bool res = loadAssImp("C:/Users/lnicolas/Documents/GitHub/projet6/objets3D/FrogUV.fbx", indices, vertices, uvs, normals);
+	bool res = loadAssImp("D:/LapendryFlorian/GitHub/projet6/objets3D/FrogUV.fbx", indices, vertices, uvs, normals);
 
 	// Generate a buffer for the indices
 	GLuint elementbuffer;
 	glGenBuffers(1, &elementbuffer);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementbuffer);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned short), indices.data(), GL_STATIC_DRAW);
-	
 
-	
+
+
 
 	GLuint VertexArrayID;
 	glGenVertexArrays(1, &VertexArrayID);
 	glBindVertexArray(VertexArrayID);
 
+	/*
 	// Projection matrix : 45° Field of View, 4:3 ratio, display range : 0.1 unit <-> 100 units
 	mat4 Projection = perspective(radians(45.0f), 4.0f / 3.0f, 0.1f, 100.0f);
 
@@ -148,8 +153,9 @@ int	main(int argc, char* argv[]){
 	mat4 Model = mat4(1.0f);
 	// Our ModelViewProjection : multiplication of our 3 matrices
 	mat4 MVP = Projection * View * Model; // Remember, matrix multiplication is the other way around
-	
-	
+	*/
+
+
 
 	GLuint vertexbuffer;
 	glGenBuffers(1, &vertexbuffer);
@@ -161,25 +167,104 @@ int	main(int argc, char* argv[]){
 	glGenBuffers(1, &colorbuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec3), vertices.data(), GL_STATIC_DRAW);
-	
+
 
 	GLuint uvbuffer;
 	glGenBuffers(1, &uvbuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
 	glBufferData(GL_ARRAY_BUFFER, uvs.size() * sizeof(glm::vec2), uvs.data(), GL_STATIC_DRAW);
 
+	//Interaction avec la souris
+	int MousePosX = 0;
+	int MousePosY = 0;
+	bool focus = true;
+	bool mouseClicRight = false;
 
-	
+	//Variables pour calcule des ms/frame
+	int nbFrames = 0;
+	double msFrames = 0;
+	auto lastTime = Clock::now();
 
 	auto time = Clock::now();
 
+	if (win != nullptr) {
+		SDL_WarpMouseInWindow(win, 1024 / 2, 768 / 2);
+		//computeMatricesFromInputs(curDirs, MousePosX, MousePosY);
+	}
+
+	startPosCamera();
+
+	Camera* camera = new Camera();
+
 	bool appRunning = true;
 	while (appRunning) {
-		
-		//SDL event pump ImGUI
+
+		Dirs curDirs;
 		SDL_Event curEvent;
 		while (SDL_PollEvent(&curEvent))
 		{
+			if (curEvent.type == SDL_QUIT || curEvent.key.keysym.sym == SDLK_ESCAPE) {
+				return 0;
+			}
+
+			if (curEvent.type == SDL_WINDOWEVENT)
+			{
+				if (curEvent.window.event == SDL_WINDOWEVENT_FOCUS_GAINED)
+				{
+					focus = true;
+				}
+				if (curEvent.window.event == SDL_WINDOWEVENT_FOCUS_LOST)
+				{
+					focus = false;
+				}
+			}
+
+			if (curEvent.type == SDL_MOUSEMOTION) {
+				SDL_GetMouseState(&MousePosX, &MousePosY);
+				//computeMatricesFromInputs(MousePosX, MousePosY);
+			}
+
+			if (curEvent.type == SDL_MOUSEBUTTONDOWN) {
+				if (curEvent.button.button == SDL_BUTTON_RIGHT) {
+					SDL_WarpMouseInWindow(win, 1024 / 2, 768 / 2);
+					mouseClicRight = true;
+				}
+			}
+			if (curEvent.type == SDL_MOUSEBUTTONUP) {
+				if (curEvent.button.button == SDL_BUTTON_RIGHT) {
+					mouseClicRight = false;
+				}
+			}
+			if (curEvent.type == SDL_MOUSEWHEEL) {
+				if (curEvent.wheel.preciseY > 0) {
+					curDirs.front = 1;
+				}
+				if (curEvent.wheel.preciseY < 0) {
+					curDirs.back = 1;
+				}
+			}
+			if (curEvent.type == SDL_KEYDOWN)
+			{
+
+				if (curEvent.key.keysym.sym == SDLK_SPACE) {
+					SDL_WarpMouseInWindow(win, 1024 / 2, 768 / 2);
+				}
+				if (curEvent.key.keysym.sym == SDLK_d) {
+					//printf("RIGHT!");
+					curDirs.right = 1;
+				}
+				if (curEvent.key.keysym.sym == SDLK_q) {
+					//printf("LEFT!");
+					curDirs.left = 1;
+				}
+				if (curEvent.key.keysym.sym == SDLK_z) {
+					curDirs.up = 1;
+				}
+				if (curEvent.key.keysym.sym == SDLK_s) {
+					curDirs.down = 1;
+				}
+			}
+
 			ImGui_ImplSDL2_ProcessEvent(&curEvent);
 			if (!io.WantCaptureMouse)
 			{
@@ -189,131 +274,144 @@ int	main(int argc, char* argv[]){
 			{
 				//use keyboard events not already used by ImGui
 			}
-			//... app processing other events;
 		}
 
-		glClear(GL_COLOR_BUFFER_BIT);
-		glUseProgram(programID);	
-		
-		// Send our transformation to the currently bound shader, in the "MVP" uniform
-		// This is done in the main loop since each model will have a different MVP matrix (At least for the M part)
-		glUniformMatrix4fv(MatrixID, 1, GL_FALSE, value_ptr(MVP));
+			//glClear(GL_COLOR_BUFFER_BIT);
+			glUseProgram(programID);
 
-		/*
+			//CAMERA
+			camera->CreateCamera(win, programID, curDirs, MousePosX, MousePosY, mouseClicRight);
 
-		// Bind our texture in Texture Unit 0
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, Texture);
-		// Set our "myTextureSampler" sampler to use Texture Unit 0
-		glUniform1i(TextureID, 0);
-		*/
+			// Clear the screen
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+			// Send our transformation to the currently bound shader, in the "MVP" uniform
+			// This is done in the main loop since each model will have a different MVP matrix (At least for the M part)
+			//glUniformMatrix4fv(MatrixID, 1, GL_FALSE, value_ptr(MVP));
+
+			/*
+
+			// Bind our texture in Texture Unit 0
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_2D, Texture);
+			// Set our "myTextureSampler" sampler to use Texture Unit 0
+			glUniform1i(TextureID, 0);
+			*/
+
+			auto curTime = Clock::now();
+			std::chrono::duration<float> elapsedSeconds = curTime - time;
+
+			//ms lisser
+			Duration deltaTime = curTime - lastTime;
+			nbFrames++;
+
+			//Render Loop
+			ImGui_ImplOpenGL3_NewFrame();
+			ImGui_ImplSDL2_NewFrame(win);
+
+			ImGui::NewFrame();
+
+			//Calcule ms/frame
+			float const curSamplingTime = GC_3D::Seconds(deltaTime);
+			if (curSamplingTime >= 1.0)
+			{
+				msFrames = curSamplingTime * 1000.0 / double(nbFrames);
+				nbFrames = 0;
+				lastTime = Clock::now();
+			}
+
+			// Draw some widgets ImGui
+			ImGui::Begin("Perfs");
+
+			ImGui::LabelText("", "Time (s) : %f", elapsedSeconds * 1e-0);
+			float FrameTime = 0;
+			float FPS = 0;
+			ImGui::LabelText("", "Frame  Time (s) : %f", FrameTime);
+			ImGui::LabelText("", "ms/frame : %f", msFrames);
+			ImGui::LabelText("", "FPS : %f", FPS);
 
 
 
-		//Render Loop
-		ImGui_ImplOpenGL3_NewFrame();
-		ImGui_ImplSDL2_NewFrame(win);
+			if (ImGui::Button("Click Button!")) {
+				printf("Button clicked ");
+			}
 
-		ImGui::NewFrame();
-		
-		auto curTime = Clock::now();
-		std::chrono::duration<float> elapsedSeconds = curTime - time;
 
-		// Draw some widgets ImGui
-		ImGui::Begin("Perfs");
-
-		ImGui::LabelText("", "Time (s) : %f", elapsedSeconds * 1e-0);
-		float FrameTime = 0;
-		float FPS = 0;
-		ImGui::LabelText("", "Frame  Time (s) : %f", FrameTime);
-		ImGui::LabelText("", "FPS : %f",  FPS);
-		
-		
-		
-		if (ImGui::Button("Click Button!")) {
-			printf("Button clicked ");
-		}
-		
-
-		ImGui::End();
+			ImGui::End();
 
 
 
 
-		glEnableVertexAttribArray(0);
-		glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
-		glVertexAttribPointer(
-			0,                  // attribute 0. No particular reason for 0, but must match the layout in the shader.
-			3,                  // size
-			GL_FLOAT,           // type
-			GL_FALSE,           // normalized?
-			0,                  // stride
-			(void*)0            // array buffer offset
-		);
+			glEnableVertexAttribArray(0);
+			glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
+			glVertexAttribPointer(
+				0,                  // attribute 0. No particular reason for 0, but must match the layout in the shader.
+				3,                  // size
+				GL_FLOAT,           // type
+				GL_FALSE,           // normalized?
+				0,                  // stride
+				(void*)0            // array buffer offset
+			);
 
-		// 2nd attribute buffer : colors
-		glEnableVertexAttribArray(1);
-		glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
-		glVertexAttribPointer(
-			1,                                // attribute. No particular reason for 1, but must match the layout in the shader.
-			3,                                // size
-			GL_FLOAT,                         // type
-			GL_FALSE,                         // normalized?
-			0,                                // stride
-			(void*)0                          // array buffer offset
-		);
+			// 2nd attribute buffer : colors
+			glEnableVertexAttribArray(1);
+			glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
+			glVertexAttribPointer(
+				1,                                // attribute. No particular reason for 1, but must match the layout in the shader.
+				3,                                // size
+				GL_FLOAT,                         // type
+				GL_FALSE,                         // normalized?
+				0,                                // stride
+				(void*)0                          // array buffer offset
+			);
 
-		// Enable depth test
-		glEnable(GL_DEPTH_TEST);
-		// Accept fragment if it closer to the camera than the former one
-		glDepthFunc(GL_LESS);
 
-		// Clear the screen
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+			// 3nd attribute buffer : UVs
+			glEnableVertexAttribArray(2);
+			glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
+			glVertexAttribPointer(
+				1,                                // attribute. No particular reason for 1, but must match the layout in the shader.
+				2,                                // size : U+V => 2
+				GL_FLOAT,                         // type
+				GL_FALSE,                         // normalized?
+				0,                                // stride
+				(void*)0                          // array buffer offset
+			);
 
-		
+			// Draw the triangle !
+			//glDrawArrays(GL_TRIANGLES, 0, indices.size()); // Starting from vertex 0; 3 vertices total -> 1 triangle
+			//glDisableVertexAttribArray(0);
 
-		// 3nd attribute buffer : UVs
-		glEnableVertexAttribArray(2);
-		glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
-		glVertexAttribPointer(
-			1,                                // attribute. No particular reason for 1, but must match the layout in the shader.
-			2,                                // size : U+V => 2
-			GL_FLOAT,                         // type
-			GL_FALSE,                         // normalized?
-			0,                                // stride
-			(void*)0                          // array buffer offset
-		);
 
-		// Draw the triangle !
-		//glDrawArrays(GL_TRIANGLES, 0, indices.size()); // Starting from vertex 0; 3 vertices total -> 1 triangle
-		//glDisableVertexAttribArray(0);
-	
-		
 
-		// Index buffer
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementbuffer);
+			// Index buffer
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementbuffer);
 
-		// Draw the triangles !
-		glDrawElements(
-			GL_TRIANGLES,      // mode
-			indices.size(),    // count
-			GL_UNSIGNED_SHORT,   // type
-			(void*)0           // element array buffer offset
-		);
+			// Draw the triangles !
+			glDrawElements(
+				GL_TRIANGLES,      // mode
+				indices.size(),    // count
+				GL_UNSIGNED_SHORT,   // type
+				(void*)0           // element array buffer offset
+			);
 
-		//Render ImGui
-		ImGui::Render();
-		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+			// Enable depth test
+			glEnable(GL_DEPTH_TEST);
+			// Accept fragment if it closer to the camera than the former one
+			glDepthFunc(GL_LESS);
 
-		//Swap window as usual
-		SDL_GL_SwapWindow(win);
+			//Render ImGui
+			ImGui::Render();
+			ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+			//Swap window as usual
+			SDL_GL_SwapWindow(win);
 	}
 
 	return 0;
 }
 
-void old() {
+/*void old() {
 	auto time = Clock::now(); // à mettre avant le double while
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_DEPTH_TEST);
@@ -393,7 +491,7 @@ void old() {
 	test.Bind();
 	test.Draw();
 
-	/*glBegin(GL_TRIANGLES);
+	glBegin(GL_TRIANGLES);
 	//Front
 	glColor4f(0.0, 1.0, 0.0, 1.0);
 	glVertex3f(-1.0f, -1.0f, 1.0f);
@@ -443,5 +541,5 @@ void old() {
 	glVertex3f(1.0f, -1.0f, -1.0f);
 	glVertex3f(-1.0f, -1.0f, -1.0f);
 
-	glEnd();*/
-}
+	glEnd();
+}*/

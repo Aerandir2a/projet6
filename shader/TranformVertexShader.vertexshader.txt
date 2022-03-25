@@ -20,5 +20,5 @@ void main(){
 	fragmentColor = vertexColor;
 
 
-	gl_Position = vec4(aPos, 5.0);
+	//gl_Position = vec4(aPos, 5.0);
 }
