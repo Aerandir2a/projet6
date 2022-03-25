@@ -180,12 +180,15 @@ int	main(int argc, char* argv[]) {
 	bool focus = true;
 	bool mouseClicRight = false;
 
+	float slidertest = 0.0f;
+
 	//Variables pour calcule des ms/frame
 	int nbFrames = 0;
 	double msFrames = 0;
+	double FPS = 0;
 	auto lastTime = Clock::now();
-
 	auto time = Clock::now();
+	auto DebutFrame = Clock::now();
 
 	if (win != nullptr) {
 		SDL_WarpMouseInWindow(win, 1024 / 2, 768 / 2);
@@ -285,25 +288,18 @@ int	main(int argc, char* argv[]) {
 			// Clear the screen
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-			// Send our transformation to the currently bound shader, in the "MVP" uniform
-			// This is done in the main loop since each model will have a different MVP matrix (At least for the M part)
-			//glUniformMatrix4fv(MatrixID, 1, GL_FALSE, value_ptr(MVP));
-
-			/*
-
-			// Bind our texture in Texture Unit 0
-			glActiveTexture(GL_TEXTURE0);
-			glBindTexture(GL_TEXTURE_2D, Texture);
-			// Set our "myTextureSampler" sampler to use Texture Unit 0
-			glUniform1i(TextureID, 0);
-			*/
-
 			auto curTime = Clock::now();
 			std::chrono::duration<float> elapsedSeconds = curTime - time;
 
 			//ms lisser
 			Duration deltaTime = curTime - lastTime;
 			nbFrames++;
+
+			//FPS
+			auto FinFrame = Clock::now();
+			Duration FPSTime = FinFrame - DebutFrame;
+			//FPS = 1.0f / GC_3D::Seconds(FPSTime);
+			DebutFrame = FinFrame;
 
 			//Render Loop
 			ImGui_ImplOpenGL3_NewFrame();
@@ -318,27 +314,30 @@ int	main(int argc, char* argv[]) {
 				msFrames = curSamplingTime * 1000.0 / double(nbFrames);
 				nbFrames = 0;
 				lastTime = Clock::now();
+				FPS = 1.0f / GC_3D::Seconds(FPSTime);
 			}
 
 			// Draw some widgets ImGui
 			ImGui::Begin("Perfs");
 
 			ImGui::LabelText("", "Time (s) : %f", elapsedSeconds * 1e-0);
-			float FrameTime = 0;
-			float FPS = 0;
-			ImGui::LabelText("", "Frame  Time (s) : %f", FrameTime);
 			ImGui::LabelText("", "ms/frame : %f", msFrames);
 			ImGui::LabelText("", "FPS : %f", FPS);
+			ImGui::LabelText("", "Valeur Slider : Test : %f", slidertest);
 
+			ImGui::End();
 
+			ImGui::Begin("Modif Scene");
+
+			ImGui::LabelText("", "Object number : ");
 
 			if (ImGui::Button("Click Button!")) {
 				printf("Button clicked ");
 			}
 
+			ImGui::SliderFloat("Test", &slidertest, 0.0f, 100.0f);
 
 			ImGui::End();
-
 
 
 
