@@ -11,10 +11,6 @@
 #include "stb.h"
 #include "Texture.hpp"
 
-
-
-
-
 using namespace GC_3D;
 
 int	main(int argc, char* argv[]){
@@ -59,14 +55,22 @@ int	main(int argc, char* argv[]){
 	GLuint LayerID = glGetUniformLocation(programID, "layer");
 
 	Texture t1;
-	t1.LoadTextureGif("D:/users/ppiglioni/projet6/images/fanta.gif");
-	//glActiveTexture(GL_TEXTURE0);
-	//glBindTexture(GL_TEXTURE_2D, t1.texture);
+	t1.LoadTextureGif("D:/users/ppiglioni/projet6/images/fanta.gif", "D:/users/ppiglioni/projet6/images/Mmmh_sun.gif", TextureID);
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D_ARRAY, t1.texture);
+	glUniform1i(TextureID, 0);
 
-	Texture t2;
-	t2.LoadTextureGif("D:/users/ppiglioni/projet6/images/fanta.gif");
-	//glActiveTexture(GL_TEXTURE1);
-	//glBindTexture(GL_TEXTURE_2D, t2.texture);
+	/*Texture t2;
+	t2.LoadTextureGif("D:/users/ppiglioni/projet6/images/Mmmh_sun.gif");
+	glActiveTexture(GL_TEXTURE2);
+	glBindTexture(GL_TEXTURE_2D_ARRAY, t2.texture);
+	glUniform1i(TextureID, 0);
+
+	Texture t3;
+	t3.LoadTextureGif("D:/users/ppiglioni/projet6/images/UwU3.gif");
+	glActiveTexture(GL_TEXTURE3);
+	glBindTexture(GL_TEXTURE_2D_ARRAY, t3.texture);
+	glUniform1i(TextureID, 0);*/
 
 	GLuint VertexArrayID;
 	glGenVertexArrays(1, &VertexArrayID);
@@ -74,9 +78,6 @@ int	main(int argc, char* argv[]){
 
 	// Projection matrix : 45° Field of View, 4:3 ratio, display range : 0.1 unit <-> 100 units
 	mat4 Projection = perspective(radians(45.0f), 4.0f / 3.0f, 0.1f, 100.0f);
-
-	// Or, for an ortho camera :
-	//glm::mat4 Projection = glm::ortho(-10.0f,10.0f,-10.0f,10.0f,0.0f,100.0f); // In world coordinates
 
 	// Camera matrix
 	mat4 View = lookAt(
@@ -172,9 +173,10 @@ int	main(int argc, char* argv[]){
 	auto timergif = Clock::now();
 
 	bool appRunning = true;
-	int frameOfGif = t1.A1.frames;
+	int frameOfGif = t1.anim.frames;
 	int frame = 0;
 	int inAnimation = 1;
+	glUniform1i(TextureID, 0);
 	while (appRunning) {
 		
 		SDL_Event curEvent;
@@ -204,7 +206,7 @@ int	main(int argc, char* argv[]){
 		glUniformMatrix4fv(MatrixID, 1, GL_FALSE, value_ptr(MVP));
 
 		// Bind our texture in Texture Unit 0
-		//glUniform1i(TextureID, 0);
+		
 		//glUniform1i(TextureID, 1);
 		//Set our "myTextureSampler" sampler to use Texture Unit 1
 
@@ -227,33 +229,36 @@ int	main(int argc, char* argv[]){
 			//printf("\nsurprise!");
 			//timergif = Clock::now();
 			//glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGBA, x3, y3, frames3, 0, GL_RGBA, GL_UNSIGNED_BYTE, data3);
-			//frameOfGif = frames3;
+			//frameOfGif = t3.anim.frames;
 			//frame = 0;
+			//glUniform1i(TextureID, 2);
 		}
 		ImGui::End();
 		
-		if (frame >= frameOfGif && inAnimation == 1) {
+		/*if (frame >= frameOfGif && inAnimation == 1) {
 			frame = 0;
-			//glUniform1i(TextureID, 1);
+			glUniform1i(TextureID, 1);
 			//glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGBA, x, y, frames, 0, GL_RGBA, GL_UNSIGNED_BYTE, data2);
-			frameOfGif = t2.A1.frames;
+			frameOfGif = t2.anim.frames;
 			inAnimation = 2;
 			timergif = Clock::now();
 		}
 		else if (frame >= frameOfGif && inAnimation == 2) {
 			frame = 0;
-			//glUniform1i(TextureID, 0);
+			glUniform1i(TextureID, 0);
 			//glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGBA, x, y, frames, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-			frameOfGif = t1.A1.frames;
+			frameOfGif = t1.anim.frames;
 			inAnimation = 1;
 			timergif = Clock::now();
-		}
+		}*/
 		
-		auto endTimerGif = Clock::now();
-		Duration timeForGif = endTimerGif - timergif;
-		frame = Seconds(timeForGif) / 0.06;
-		glUniform1i(LayerID, frame);
+		//auto endTimerGif = Clock::now();
+		//Duration timeForGif = endTimerGif - timergif;
+		//frame = Seconds(timeForGif) / 0.06;
+		//glUniform1i(LayerID, frame);
 		//glUniform1i(LayerID,int(elapsedSecondsf * 25)% frameOfGif);
+
+		t1.GifTick(TextureID, LayerID);
 		
 		
 
