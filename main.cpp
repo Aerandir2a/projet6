@@ -56,7 +56,7 @@ int	main(int argc, char* argv[]) {
 
 
 	//GLuint programID = LoadShaders("C:/Users/lnicolas/Documents/GitHub/projet6/shader/TranformVertexShader.vertexshader.txt", "C:/Users/lnicolas/Documents/GitHub/projet6/shader/SimpleFragmentShader.fragmentshader.txt");
-	GLuint programID = LoadShaders("D:/LapendryFlorian/GitHub/projet6/shader/TranformVertexShader.vertexshader.txt", "D:/LapendryFlorian/GitHub/projet6/shader/SimpleFragmentShader.fragmentshader.txt");
+	GLuint programID = LoadShaders("C:/Users/lnicolas/Documents/GitHub/projet6/shader/TranformVertexShader.vertexshader.txt", "C:/Users/lnicolas/Documents/GitHub/projet6/shader/SimpleFragmentShader.fragmentshader.txt");
 
 	//permet d'afficher la face avant mais pas la face derrière
 	//glEnable(GL_CULL_FACE);
@@ -120,7 +120,7 @@ int	main(int argc, char* argv[]) {
 	std::vector< glm::vec3 > vertices;
 	std::vector< glm::vec2 > uvs;
 	std::vector< glm::vec3 > normals; // Won't be used at the moment.
-	bool res = loadAssImp("D:/LapendryFlorian/GitHub/projet6/objets3D/FrogUV.fbx", indices, vertices, uvs, normals);
+	bool res = loadAssImp("C:/Users/lnicolas/Documents/GitHub/projet6/objets3D/shibaUP.fbx", indices, vertices, uvs, normals);
 
 	// Generate a buffer for the indices
 	GLuint elementbuffer;
