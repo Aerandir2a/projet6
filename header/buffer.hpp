@@ -8,7 +8,12 @@ class Buffer
 	int attribut;
 
 public:
-	void CreateBuffer(const GLfloat* iData, size_t iSize);
+	void CreateBuffer(const void* iData, size_t iSize);
+	template<typename T>
+	void CreateBuffer(std::vector<T> const& iData)
+	{
+		return CreateBuffer(iData.data(), sizeof(T)*iData.size());
+	}
 	void BindBuffer(int attribut, int iSize);
 
 };

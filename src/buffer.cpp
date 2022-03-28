@@ -2,7 +2,7 @@
 
 using namespace GC_3D;
 
-void Buffer::CreateBuffer(const GLfloat* iData, size_t iSize)
+void Buffer::CreateBuffer(const void* iData, size_t iSize)
 {
 	glGenBuffers(1, &m_buffer);
 	glBindBuffer(GL_ARRAY_BUFFER, m_buffer);

@@ -7,7 +7,7 @@
 #include"shader/shader.hpp"
 #define STB_IMAGE_IMPLEMENTATION
 #include "header/stb_image.h"
-//#include "header/buffer.hpp"
+#include "header/buffer.hpp"
 #include "header/controls.hpp"
 #include "header/camera.hpp"
 #include "dep/imgui/imgui.h"
@@ -51,17 +51,12 @@ int	main(int argc, char* argv[]) {
 	ImGui_ImplOpenGL3_Init();
 	ImGui::StyleColorsDark();
 
-
-
-
-
 	//GLuint programID = LoadShaders("C:/Users/lnicolas/Documents/GitHub/projet6/shader/TranformVertexShader.vertexshader.txt", "C:/Users/lnicolas/Documents/GitHub/projet6/shader/SimpleFragmentShader.fragmentshader.txt");
 	GLuint programID = LoadShaders("D:/LapendryFlorian/GitHub/projet6/shader/TranformVertexShader.vertexshader.txt", "D:/LapendryFlorian/GitHub/projet6/shader/SimpleFragmentShader.fragmentshader.txt");
 
 	//permet d'afficher la face avant mais pas la face derrière
 	//glEnable(GL_CULL_FACE);
 	//glCullFace(GL_FRONT);
-
 
 	// Get a handle for our "MVP" uniform
 	// Only during the initialisation
@@ -98,11 +93,7 @@ int	main(int argc, char* argv[]) {
 	}
 	*/
 
-
-
-
 	// fill "indices" as needed
-
 
 	/*
 	// Read our .obj file
@@ -112,8 +103,6 @@ int	main(int argc, char* argv[]) {
 	std::vector< glm::vec3 > normals; // Won't be used at the moment.
 	bool res = loadAssImp("C:/Users/lnicolas/Documents/GitHub/projet6/objets3D/FrogUV.fbx", indices, vertices, uvs, normals);
 	*/
-
-
 
 	// Read our .obj file
 	std::vector<unsigned short> indices;
@@ -128,51 +117,39 @@ int	main(int argc, char* argv[]) {
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementbuffer);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned short), indices.data(), GL_STATIC_DRAW);
 
-
-
-
 	GLuint VertexArrayID;
 	glGenVertexArrays(1, &VertexArrayID);
 	glBindVertexArray(VertexArrayID);
 
-	/*
-	// Projection matrix : 45° Field of View, 4:3 ratio, display range : 0.1 unit <-> 100 units
-	mat4 Projection = perspective(radians(45.0f), 4.0f / 3.0f, 0.1f, 100.0f);
+	// Buffer + CreateBuffer
+	Buffer* Vbuffer = new Buffer();
+	Buffer* Cbuffer = new Buffer();
+	Buffer* UVbuffer = new Buffer();
 
-	// Or, for an ortho camera :
-	//glm::mat4 Projection = glm::ortho(-10.0f,10.0f,-10.0f,10.0f,0.0f,100.0f); // In world coordinates
+	Vbuffer->CreateBuffer(vertices.data(), vertices.size() * sizeof(glm::vec3));
+	Cbuffer->CreateBuffer(vertices.data(), vertices.size() * sizeof(glm::vec3));
+	UVbuffer->CreateBuffer(uvs.data(), uvs.size() * sizeof(glm::vec2));
 
-	// Camera matrix
-	mat4 View = lookAt(
-		vec3(4, 2, 4), // Camera is at (4,3,3), in World Space
-		vec3(0, 0, 0), // and looks at the origin
-		vec3(0, 1, 0)  // Head is up (set to 0,-1,0 to look upside-down)
-	);
+	//GLuint vertexbuffer;
+	//glGenBuffers(1, &vertexbuffer);
+	//glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
+	//glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec3), vertices.data(), GL_STATIC_DRAW);
+	//GLuint colorbuffer;
+	//glGenBuffers(1, &colorbuffer);
+	//glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
+	//glBufferData(GL_ELEMENT_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec3), vertices.data(), GL_STATIC_DRAW);
+	//GLuint uvbuffer;
+	//glGenBuffers(1, &uvbuffer);
+	//glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
+	//glBufferData(GL_ARRAY_BUFFER, uvs.size() * sizeof(glm::vec2), uvs.data(), GL_STATIC_DRAW);
 
-	// Model matrix : an identity matrix (model will be at the origin)
-	mat4 Model = mat4(1.0f);
-	// Our ModelViewProjection : multiplication of our 3 matrices
-	mat4 MVP = Projection * View * Model; // Remember, matrix multiplication is the other way around
-	*/
-
-
-
-	GLuint vertexbuffer;
-	glGenBuffers(1, &vertexbuffer);
-	glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
-	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec3), vertices.data(), GL_STATIC_DRAW);
-
-
-	GLuint colorbuffer;
-	glGenBuffers(1, &colorbuffer);
-	glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec3), vertices.data(), GL_STATIC_DRAW);
-
-
-	GLuint uvbuffer;
-	glGenBuffers(1, &uvbuffer);
-	glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
-	glBufferData(GL_ARRAY_BUFFER, uvs.size() * sizeof(glm::vec2), uvs.data(), GL_STATIC_DRAW);
+	// Tableau de position des objets
+	std::vector<mat4> ModelMatrix = {
+		glm::translate(glm::identity<mat4>(), glm::vec3(0.0, 0.0, 0.0)),
+		//glm::translate(glm::identity<mat4>(), glm::vec3(2.5, 0.0, 0.0)),
+		//glm::translate(glm::identity<mat4>(), glm::vec3(-2.5, 4.0, 0.0)),
+		//glm::translate(glm::identity<mat4>(), glm::vec3(2.5, 4.0, 0.0)),
+	};
 
 	//Interaction avec la souris
 	int MousePosX = 0;
@@ -180,7 +157,7 @@ int	main(int argc, char* argv[]) {
 	bool focus = true;
 	bool mouseClicRight = false;
 
-	float slidertest = 0.0f;
+	int slidertest = 1;
 
 	//Variables pour calcule des ms/frame
 	int nbFrames = 0;
@@ -198,6 +175,7 @@ int	main(int argc, char* argv[]) {
 	startPosCamera();
 
 	Camera* camera = new Camera();
+	camera->CreateCamera();
 
 	bool appRunning = true;
 	while (appRunning) {
@@ -206,7 +184,7 @@ int	main(int argc, char* argv[]) {
 		SDL_Event curEvent;
 		while (SDL_PollEvent(&curEvent))
 		{
-			if (curEvent.type == SDL_QUIT || curEvent.key.keysym.sym == SDLK_ESCAPE) {
+			if (curEvent.type == SDL_QUIT && curEvent.key.keysym.sym == SDLK_ESCAPE) {
 				return 0;
 			}
 
@@ -283,7 +261,10 @@ int	main(int argc, char* argv[]) {
 			glUseProgram(programID);
 
 			//CAMERA
-			camera->CreateCamera(win, programID, curDirs, MousePosX, MousePosY, mouseClicRight);
+			camera->UpdateCamera(win, curDirs, MousePosX, MousePosY, mouseClicRight);
+
+			// Matrix mvp
+			glm::mat4 mvp;
 
 			// Clear the screen
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -318,30 +299,35 @@ int	main(int argc, char* argv[]) {
 			}
 
 			// Draw some widgets ImGui
+			// Fenetre Performance 
 			ImGui::Begin("Perfs");
 
 			ImGui::LabelText("", "Time (s) : %f", elapsedSeconds * 1e-0);
 			ImGui::LabelText("", "ms/frame : %f", msFrames);
 			ImGui::LabelText("", "FPS : %f", FPS);
-			ImGui::LabelText("", "Valeur Slider : Test : %f", slidertest);
+			ImGui::LabelText("", "Valeur Slider : Test : %i", slidertest);
 
 			ImGui::End();
 
+			// Fenetre Modif
 			ImGui::Begin("Modif Scene");
 
-			ImGui::LabelText("", "Object number : ");
+			ImGui::LabelText("", "Object number : %i", ModelMatrix.size());
 
-			if (ImGui::Button("Click Button!")) {
+			/*if (ImGui::Button("Click Button!")) {
 				printf("Button clicked ");
-			}
+			}*/
 
-			ImGui::SliderFloat("Test", &slidertest, 0.0f, 100.0f);
+			ImGui::SliderInt("Test", &slidertest, 1, 100000);
 
 			ImGui::End();
 
+			// Bind Buffer
+			Vbuffer->BindBuffer(0, 3);
+			Cbuffer->BindBuffer(1, 3);
+			UVbuffer->BindBuffer(1, 2);
 
-
-			glEnableVertexAttribArray(0);
+			/*glEnableVertexAttribArray(0);
 			glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
 			glVertexAttribPointer(
 				0,                  // attribute 0. No particular reason for 0, but must match the layout in the shader.
@@ -364,7 +350,6 @@ int	main(int argc, char* argv[]) {
 				(void*)0                          // array buffer offset
 			);
 
-
 			// 3nd attribute buffer : UVs
 			glEnableVertexAttribArray(2);
 			glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
@@ -375,24 +360,44 @@ int	main(int argc, char* argv[]) {
 				GL_FALSE,                         // normalized?
 				0,                                // stride
 				(void*)0                          // array buffer offset
-			);
-
+			);*/
+			
 			// Draw the triangle !
 			//glDrawArrays(GL_TRIANGLES, 0, indices.size()); // Starting from vertex 0; 3 vertices total -> 1 triangle
 			//glDisableVertexAttribArray(0);
 
 
+			// Afficher le nombre d'objet selon la valeur du slider
+			if (ModelMatrix.size() < slidertest) {
+				int diff = slidertest - ModelMatrix.size();
+				for (int i = 0; i < diff; i++) {
+					glm::mat4 const& lastVec = ModelMatrix.back();
+					ModelMatrix.push_back(glm::translate(lastVec, glm::vec3(0.0, 4.0, 0.0)));
+				}
+			}
+			if (ModelMatrix.size() > slidertest) {
 
-			// Index buffer
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementbuffer);
+				ModelMatrix.resize(slidertest);
+			}
+			
+			// Afficher le nombre d'objet correspondant à la taille du tableau ModelMatrix
+			for (int i = 0; i < ModelMatrix.size(); i++) {
+				mvp = camera->ProjectionMatrix * camera->ViewMatrix * ModelMatrix[i];
+				GLuint MatrixID = glGetUniformLocation(programID, "MVP");
+				glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &mvp[0][0]);
 
-			// Draw the triangles !
-			glDrawElements(
-				GL_TRIANGLES,      // mode
-				indices.size(),    // count
-				GL_UNSIGNED_SHORT,   // type
-				(void*)0           // element array buffer offset
-			);
+				// Index buffer
+				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementbuffer);
+
+				// Draw the triangles !
+				glDrawElements(
+					GL_TRIANGLES,      // mode
+					indices.size(),    // count
+					GL_UNSIGNED_SHORT,   // type
+					(void*)0           // element array buffer offset
+				);
+			}
+			
 
 			// Enable depth test
 			glEnable(GL_DEPTH_TEST);
