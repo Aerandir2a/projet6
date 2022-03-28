@@ -1,15 +1,16 @@
+#include <GL/glew.h>
 #include<iostream>
 #include<SDL.h>
 #ifdef _WIN32
 #include <windows.h>
 #endif
-#include"gc_3d_defs.hpp"
+#include "Texture.hpp"
 #include"shader/shader.hpp"
 #include "dep/imgui/imgui.h"
 #include "dep/imgui/backends/imgui_impl_opengl3.h"
 #include "dep/imgui/backends/imgui_impl_sdl.h"
 #include "stb.h"
-#include "Texture.hpp"
+#include "gc_3d_defs.hpp"
 
 using namespace GC_3D;
 
@@ -55,22 +56,23 @@ int	main(int argc, char* argv[]){
 	GLuint LayerID = glGetUniformLocation(programID, "layer");
 
 	Texture t1;
-	t1.LoadTextureGif("D:/users/ppiglioni/projet6/images/fanta.gif", "D:/users/ppiglioni/projet6/images/Mmmh_sun.gif", TextureID);
+	t1.LoadTextureGif("D:/users/ppiglioni/projet6/images/fanta.gif");
+	//t1.LoadTexture2D("D:/users/ppiglioni/projet6/images/UwU2.jpg");
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D_ARRAY, t1.texture);
 	glUniform1i(TextureID, 0);
 
-	/*Texture t2;
-	t2.LoadTextureGif("D:/users/ppiglioni/projet6/images/Mmmh_sun.gif");
+	Texture t2;
+	t2.LoadTextureGif("D:/users/ppiglioni/projet6/images/UwURotate.gif");
 	glActiveTexture(GL_TEXTURE2);
 	glBindTexture(GL_TEXTURE_2D_ARRAY, t2.texture);
 	glUniform1i(TextureID, 0);
 
 	Texture t3;
-	t3.LoadTextureGif("D:/users/ppiglioni/projet6/images/UwU3.gif");
+	t3.LoadTextureGif("D:/users/ppiglioni/projet6/images/rickroll_roll.gif");
 	glActiveTexture(GL_TEXTURE3);
 	glBindTexture(GL_TEXTURE_2D_ARRAY, t3.texture);
-	glUniform1i(TextureID, 0);*/
+	glUniform1i(TextureID, 0);
 
 	GLuint VertexArrayID;
 	glGenVertexArrays(1, &VertexArrayID);
@@ -173,7 +175,7 @@ int	main(int argc, char* argv[]){
 	auto timergif = Clock::now();
 
 	bool appRunning = true;
-	int frameOfGif = t1.anim.frames;
+	int frameOfGif = t1.frames;
 	int frame = 0;
 	int inAnimation = 1;
 	glUniform1i(TextureID, 0);
@@ -217,7 +219,7 @@ int	main(int argc, char* argv[]){
 		
 		auto curTime = Clock::now();
 		Duration elapsedSeconds = curTime - time;
-		float elapsedSecondsf = Seconds(elapsedSeconds);
+		float elapsedSecondsf = GC_3D::Seconds(elapsedSeconds);
 
 		ImGui::Begin("Perfs");
 		/*ImGui::LabelText("Time from the beginning : ", "%f", elapsedSecondsf * 1e-0);
@@ -225,13 +227,14 @@ int	main(int argc, char* argv[]){
 		ImGui::LabelText("FPS : ", "%f",  1 / elapsedSecondsf);*/
 		ImGui::LabelText("Time : ", "%f", elapsedSecondsf);
 		ImGui::LabelText("frame : ", "%i", frame);
+		
 		if (ImGui::Button("Surprise!")) {
 			//printf("\nsurprise!");
-			//timergif = Clock::now();
+			timergif = Clock::now();
 			//glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGBA, x3, y3, frames3, 0, GL_RGBA, GL_UNSIGNED_BYTE, data3);
-			//frameOfGif = t3.anim.frames;
-			//frame = 0;
-			//glUniform1i(TextureID, 2);
+			frameOfGif = t3.frames;
+			frame = 0;
+			glUniform1i(TextureID, 2);
 		}
 		ImGui::End();
 		
@@ -239,7 +242,7 @@ int	main(int argc, char* argv[]){
 			frame = 0;
 			glUniform1i(TextureID, 1);
 			//glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGBA, x, y, frames, 0, GL_RGBA, GL_UNSIGNED_BYTE, data2);
-			frameOfGif = t2.anim.frames;
+			frameOfGif = t2.frames;
 			inAnimation = 2;
 			timergif = Clock::now();
 		}
@@ -247,20 +250,17 @@ int	main(int argc, char* argv[]){
 			frame = 0;
 			glUniform1i(TextureID, 0);
 			//glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGBA, x, y, frames, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-			frameOfGif = t1.anim.frames;
+			frameOfGif = t1.frames;
 			inAnimation = 1;
 			timergif = Clock::now();
-		}*/
+		}
 		
-		//auto endTimerGif = Clock::now();
-		//Duration timeForGif = endTimerGif - timergif;
-		//frame = Seconds(timeForGif) / 0.06;
-		//glUniform1i(LayerID, frame);
-		//glUniform1i(LayerID,int(elapsedSecondsf * 25)% frameOfGif);
-
-		t1.GifTick(TextureID, LayerID);
-		
-		
+		auto endTimerGif = Clock::now();
+		Duration timeForGif = endTimerGif - timergif;
+		frame = Seconds(timeForGif) / 0.06;
+		glUniform1i(LayerID, frame);*/
+		Texture::GifTick(frame, frameOfGif, inAnimation, TextureID, LayerID,t1,t2);
+	
 
 		glEnableVertexAttribArray(0);
 		glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
