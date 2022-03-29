@@ -109,7 +109,7 @@ int	main(int argc, char* argv[]) {
 	std::vector< glm::vec3 > vertices;
 	std::vector< glm::vec2 > uvs;
 	std::vector< glm::vec3 > normals; // Won't be used at the moment.
-	bool res = loadAssImp("D:/LapendryFlorian/GitHub/projet6/objets3D/FrogUV.fbx", indices, vertices, uvs, normals);
+	bool res = loadAssImp("D:/LapendryFlorian/GitHub/projet6/objets3D/shibaUV.fbx", indices, vertices, uvs, normals);
 
 	// Generate a buffer for the indices
 	GLuint elementbuffer;
@@ -143,17 +143,9 @@ int	main(int argc, char* argv[]) {
 	//glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
 	//glBufferData(GL_ARRAY_BUFFER, uvs.size() * sizeof(glm::vec2), uvs.data(), GL_STATIC_DRAW);
 
-	// Tableau de position des objets
-	std::vector<mat4> ModelMatrix = {
-		glm::translate(glm::identity<mat4>(), glm::vec3(0.0, 0.0, 0.0)),
-		//glm::translate(glm::identity<mat4>(), glm::vec3(2.5, 0.0, 0.0)),
-		//glm::translate(glm::identity<mat4>(), glm::vec3(-2.5, 4.0, 0.0)),
-		//glm::translate(glm::identity<mat4>(), glm::vec3(2.5, 4.0, 0.0)),
-	};
-
 	//Interaction avec la souris
-	int MousePosX = 0;
-	int MousePosY = 0;
+	int MousePosX = 1024/2;
+	int MousePosY = 768/2;
 	bool focus = true;
 	bool mouseClicRight = false;
 
@@ -169,13 +161,31 @@ int	main(int argc, char* argv[]) {
 
 	if (win != nullptr) {
 		SDL_WarpMouseInWindow(win, 1024 / 2, 768 / 2);
-		//computeMatricesFromInputs(curDirs, MousePosX, MousePosY);
 	}
 
-	startPosCamera();
+	//startPosCamera();
 
+	//Camera Init
 	Camera* camera = new Camera();
 	camera->CreateCamera();
+
+	// Tableau de position des objets
+	std::vector<mat4> ModelMatrix;
+
+	//Init tableau d'Objet (64 000 objets soit 40x40x40)
+	int nMax = 40;
+	float scale = 5.0f; // Distance entre les objets
+	for (int i = 0; i < nMax; i++) { // Axe X
+		for (int j = 0; j < nMax; j++) { // Axe Y
+			for (int k = 0; k < nMax; k++) { // Axe Z
+				glm::vec3 pos =
+					i * scale * vec3(1.0f, 0.0f, 0.0f) +
+					j * scale * vec3(0.0f, 1.0f, 0.0f) +
+					k * scale * vec3(0.0f, 0.0f, -1.0f);
+				ModelMatrix.push_back(glm::translate(mat4(1.0f), pos));
+			}
+		}
+	}
 
 	bool appRunning = true;
 	while (appRunning) {
@@ -184,7 +194,7 @@ int	main(int argc, char* argv[]) {
 		SDL_Event curEvent;
 		while (SDL_PollEvent(&curEvent))
 		{
-			if (curEvent.type == SDL_QUIT && curEvent.key.keysym.sym == SDLK_ESCAPE) {
+			if (curEvent.type == SDL_QUIT /* || curEvent.key.keysym.sym == SDLK_ESCAPE*/) {
 				return 0;
 			}
 
@@ -201,8 +211,9 @@ int	main(int argc, char* argv[]) {
 			}
 
 			if (curEvent.type == SDL_MOUSEMOTION) {
-				SDL_GetMouseState(&MousePosX, &MousePosY);
-				//computeMatricesFromInputs(MousePosX, MousePosY);
+				if (mouseClicRight) {	
+					SDL_GetMouseState(&MousePosX, &MousePosY);
+				}
 			}
 
 			if (curEvent.type == SDL_MOUSEBUTTONDOWN) {
@@ -317,8 +328,7 @@ int	main(int argc, char* argv[]) {
 			/*if (ImGui::Button("Click Button!")) {
 				printf("Button clicked ");
 			}*/
-
-			ImGui::SliderInt("Test", &slidertest, 1, 100000);
+			ImGui::SliderInt("Test", &slidertest, 1, std::pow(nMax, 3));
 
 			ImGui::End();
 
@@ -362,11 +372,29 @@ int	main(int argc, char* argv[]) {
 				(void*)0                          // array buffer offset
 			);*/
 			
+			// Afficher le nombre d'objet correspondant à la taille du tableau ModelMatrix
+			for (int i = 0; i < slidertest; i++) {
+				mvp = camera->ProjectionMatrix * camera->ViewMatrix * ModelMatrix[i];
+				GLuint MatrixID = glGetUniformLocation(programID, "MVP");
+				glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &mvp[0][0]);
+
+				// Index buffer
+				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementbuffer);
+
+				// Draw the triangles !
+				glDrawElements(
+					GL_TRIANGLES,      // mode
+					indices.size(),    // count
+					GL_UNSIGNED_SHORT,   // type
+					(void*)0           // element array buffer offset
+				);
+			}
 			// Draw the triangle !
 			//glDrawArrays(GL_TRIANGLES, 0, indices.size()); // Starting from vertex 0; 3 vertices total -> 1 triangle
 			//glDisableVertexAttribArray(0);
 
 
+			/*
 			// Afficher le nombre d'objet selon la valeur du slider
 			if (ModelMatrix.size() < slidertest) {
 				int diff = slidertest - ModelMatrix.size();
@@ -379,7 +407,9 @@ int	main(int argc, char* argv[]) {
 
 				ModelMatrix.resize(slidertest);
 			}
-			
+			*/
+
+			/*
 			// Afficher le nombre d'objet correspondant à la taille du tableau ModelMatrix
 			for (int i = 0; i < ModelMatrix.size(); i++) {
 				mvp = camera->ProjectionMatrix * camera->ViewMatrix * ModelMatrix[i];
@@ -397,6 +427,7 @@ int	main(int argc, char* argv[]) {
 					(void*)0           // element array buffer offset
 				);
 			}
+			*/
 			
 
 			// Enable depth test
