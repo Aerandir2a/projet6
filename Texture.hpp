@@ -24,5 +24,6 @@ public:
 	Timestamp timergif;
 	void LoadTextureGif(char* path);
 	void LoadTexture2D(char* path);
-	static void GifTick(int frame, int frameOfGif, int inAnimation, GLuint tex, GLuint lay, Texture tx1, Texture tx2);
+	static void GifTick(Texture tex, GLuint lay, int* frame);
+	//static void GifTick(int* frame, int* frameOfGif, int* inAnimation, GLuint tex, GLuint lay, Texture tx1, Texture tx2);
 };

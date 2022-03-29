@@ -56,14 +56,14 @@ int	main(int argc, char* argv[]){
 	GLuint LayerID = glGetUniformLocation(programID, "layer");
 
 	Texture t1;
-	t1.LoadTextureGif("D:/users/ppiglioni/projet6/images/fanta.gif");
+	t1.LoadTextureGif("D:/users/ppiglioni/projet6/images/Mmmh_sun.gif");
 	//t1.LoadTexture2D("D:/users/ppiglioni/projet6/images/UwU2.jpg");
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D_ARRAY, t1.texture);
 	glUniform1i(TextureID, 0);
 
 	Texture t2;
-	t2.LoadTextureGif("D:/users/ppiglioni/projet6/images/UwURotate.gif");
+	t2.LoadTextureGif("D:/users/ppiglioni/projet6/images/fanta.gif");
 	glActiveTexture(GL_TEXTURE2);
 	glBindTexture(GL_TEXTURE_2D_ARRAY, t2.texture);
 	glUniform1i(TextureID, 0);
@@ -259,8 +259,9 @@ int	main(int argc, char* argv[]){
 		Duration timeForGif = endTimerGif - timergif;
 		frame = Seconds(timeForGif) / 0.06;
 		glUniform1i(LayerID, frame);*/
-		Texture::GifTick(frame, frameOfGif, inAnimation, TextureID, LayerID,t1,t2);
-	
+		//Texture::GifTick(&frame, &frameOfGif, &inAnimation, TextureID, LayerID,t1,t2);
+		Texture::GifTick(t1, LayerID, &frame);
+		
 
 		glEnableVertexAttribArray(0);
 		glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
