@@ -8,6 +8,8 @@ shader/shader.hpp
 shader/loadShader.cpp
 shader/TranformVertexShader.vertexshader.txt
 shader/SimpleFragmentShader.fragmentshader.txt
+1.model_loading.fs
+1.model_loading.vs
 header/stb_image.h
 images/UwU.jpg
 images/UwU2.jpg
@@ -19,6 +21,9 @@ header/buffer.hpp
 header/camera.hpp
 header/controls.hpp
 header/directorySnippet.h
+header/mesh.h
+header/model.h
+header/shader_.h
 src/buffer.cpp
 src/camera.cpp
 src/controls.cpp

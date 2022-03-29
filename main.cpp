@@ -18,6 +18,9 @@
 
 #include <filesystem>
 #include "header/directorySnippet.h"
+#include "shader/ModelShader.h"
+#include "header/model.h"
+#include "header/shader_.h"
 
 
 
@@ -54,14 +57,16 @@ int	main(int argc, char* argv[]) {
 	ImGui_ImplOpenGL3_Init();
 	ImGui::StyleColorsDark();
 
-	//GLuint programID = LoadShaders("C:/Users/LenyN/Documents/GitHub/projet6/shader/TranformVertexShader.vertexshader.txt", "C:/Users/LenyN/Documents/GitHub/projet6/shader/SimpleFragmentShader.fragmentshader.txt");
-	GLuint programID = LoadShaders("C:/Users/LenyN/Documents/GitHub/projet6/shader/TranformVertexShader.vertexshader.txt", "C:/Users/LenyN/Documents/GitHub/projet6/shader/SimpleFragmentShader.fragmentshader.txt");
-
 	std::filesystem::path appPath(GetAppPath());
 	auto appDir = appPath.parent_path();
 	auto shaderPath = appDir / "shaders";
 	auto vShaderPath = shaderPath / "defaultVertexShader.glsl";
 	auto fShaderPath = shaderPath / "defaultFragmentShader.glsl";
+
+	//GLuint programID = LoadShaders("C:/Users/LenyN/Documents/GitHub/projet6/shader/TranformVertexShader.vertexshader.txt", "C:/Users/LenyN/Documents/GitHub/projet6/shader/SimpleFragmentShader.fragmentshader.txt");
+	GLuint programID = LoadShaders("C:/Users/LenyN/Documents/GitHub/projet6/shader/TranformVertexShader.vertexshader.txt", "C:/Users/LenyN/Documents/GitHub/projet6/shader/SimpleFragmentShader.fragmentshader.txt");
+
+	
 
 	//permet d'afficher la face avant mais pas la face derrière
 	//glEnable(GL_CULL_FACE);
@@ -118,7 +123,12 @@ int	main(int argc, char* argv[]) {
 	std::vector< glm::vec3 > vertices;
 	std::vector< glm::vec2 > uvs;
 	std::vector< glm::vec3 > normals; // Won't be used at the moment.
-	bool res = loadAssImp("C:/Users/LenyN/Documents/GitHub/projet6/objets3D/shibaUV.fbx", indices, vertices, uvs, normals);
+	//bool res = loadAssImp("C:/Users/LenyN/Documents/GitHub/projet6/objets3D/shibaUV.fbx", indices, vertices, uvs, normals);
+	Model ourModel("C:/Users/LenyN/Documents/GitHub/projet6/objets3D/shibaUV.fbx");
+
+	// build and compile shaders
+	// -------------------------
+	Shader ourShader("1.model_loading.vs", "1.model_loading.fs");
 
 	// Generate a buffer for the indices
 	GLuint elementbuffer;
@@ -185,6 +195,8 @@ int	main(int argc, char* argv[]) {
 
 	Camera* camera = new Camera();
 	camera->CreateCamera();
+
+	
 
 	bool appRunning = true;
 	while (appRunning) {
@@ -469,6 +481,13 @@ int	main(int argc, char* argv[]) {
 					(void*)0           // element array buffer offset
 				);
 			}
+
+			// render the loaded model
+			glm::mat4 model = glm::mat4(1.0f);
+			model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f)); // translate it down so it's at the center of the scene
+			model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));	// it's a bit too big for our scene, so scale it down
+			ourShader.setMat4("model", model);
+			ourModel.Draw(ourShader);
 			
 
 			// Enable depth test
