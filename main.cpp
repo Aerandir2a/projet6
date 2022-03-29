@@ -51,8 +51,8 @@ int	main(int argc, char* argv[]) {
 	ImGui_ImplOpenGL3_Init();
 	ImGui::StyleColorsDark();
 
-	//GLuint programID = LoadShaders("C:/Users/lnicolas/Documents/GitHub/projet6/shader/TranformVertexShader.vertexshader.txt", "C:/Users/lnicolas/Documents/GitHub/projet6/shader/SimpleFragmentShader.fragmentshader.txt");
-	GLuint programID = LoadShaders("C:/Users/lnicolas/Documents/GitHub/projet6/shader/TranformVertexShader.vertexshader.txt", "C:/Users/lnicolas/Documents/GitHub/projet6/shader/SimpleFragmentShader.fragmentshader.txt");
+	//GLuint programID = LoadShaders("C:/Users/LenyN/Documents/GitHub/projet6/shader/TranformVertexShader.vertexshader.txt", "C:/Users/LenyN/Documents/GitHub/projet6/shader/SimpleFragmentShader.fragmentshader.txt");
+	GLuint programID = LoadShaders("C:/Users/LenyN/Documents/GitHub/projet6/shader/TranformVertexShader.vertexshader.txt", "C:/Users/LenyN/Documents/GitHub/projet6/shader/SimpleFragmentShader.fragmentshader.txt");
 
 	//permet d'afficher la face avant mais pas la face derrière
 	//glEnable(GL_CULL_FACE);
@@ -77,7 +77,7 @@ int	main(int argc, char* argv[]) {
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	// load and generate the texture
 	int width, height, nrChannels;
-	unsigned char* data = stbi_load("C:/Users/lnicolas/Documents/GitHub/projet6/images/portal.png", &width, &height, &nrChannels, 0);
+	unsigned char* data = stbi_load("C:/Users/LenyN/Documents/GitHub/projet6/images/portal.png", &width, &height, &nrChannels, 0);
 
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
@@ -101,7 +101,7 @@ int	main(int argc, char* argv[]) {
 	std::vector< glm::vec3 > vertices;
 	std::vector< glm::vec2 > uvs;
 	std::vector< glm::vec3 > normals; // Won't be used at the moment.
-	bool res = loadAssImp("C:/Users/lnicolas/Documents/GitHub/projet6/objets3D/FrogUV.fbx", indices, vertices, uvs, normals);
+	bool res = loadAssImp("C:/Users/LenyN/Documents/GitHub/projet6/objets3D/FrogUV.fbx", indices, vertices, uvs, normals);
 	*/
 
 	// Read our .obj file
@@ -109,7 +109,7 @@ int	main(int argc, char* argv[]) {
 	std::vector< glm::vec3 > vertices;
 	std::vector< glm::vec2 > uvs;
 	std::vector< glm::vec3 > normals; // Won't be used at the moment.
-	bool res = loadAssImp("C:/Users/lnicolas/Documents/GitHub/projet6/objets3D/shibaUV.fbx", indices, vertices, uvs, normals);
+	bool res = loadAssImp("C:/Users/LenyN/Documents/GitHub/projet6/objets3D/shibaUV.fbx", indices, vertices, uvs, normals);
 
 	// Generate a buffer for the indices
 	GLuint elementbuffer;
@@ -320,19 +320,68 @@ int	main(int argc, char* argv[]) {
 
 			ImGui::SliderInt("Test", &slidertest, 1, 100000);
 
-			if (ImGui::Button("Objet + 1")) {
+			if (ImGui::Button("+ 1")) {
 				slidertest++;
-				printf("Objet + 1");
+				printf("Objet + 1 ");
 			}
 
-			if (ImGui::Button("Objet - 1")) {
-				if (slidertest >= 1)
+			ImGui::SameLine();
+
+			if (ImGui::Button("- 1")) {
+				if (slidertest > 1)
 				{
 					slidertest--;
-					printf("Objet - 1");
+					printf("Objet - 1 ");
 				}
 
 			}
+
+			
+
+			if (ImGui::Button("+ 10")) {
+				slidertest = slidertest + 10;
+			}
+
+			ImGui::SameLine();
+
+			if (ImGui::Button("- 10")) {
+				if (slidertest > 10)
+				{
+					slidertest = slidertest - 10;
+				}
+
+			}
+
+
+			if (ImGui::Button("+ 100")) {
+				slidertest = slidertest + 100;
+			}
+
+			ImGui::SameLine();
+
+			if (ImGui::Button("- 100")) {
+				if (slidertest > 100)
+				{
+					slidertest = slidertest - 100;
+				}
+
+			}
+
+			if (ImGui::Button("+ 1000")) {
+				slidertest = slidertest + 1000;
+			}
+
+			ImGui::SameLine();
+
+			if (ImGui::Button("- 1000")) {
+				if (slidertest > 1000)
+				{
+					slidertest = slidertest - 1000;
+				}
+
+			}
+
+			
 
 			ImGui::End();
 
