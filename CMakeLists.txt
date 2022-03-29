@@ -9,8 +9,6 @@ shader/loadShader.cpp
 shader/TranformVertexShader.vertexshader.txt
 shader/SimpleFragmentShader.fragmentshader.txt
 header/stb_image.h
-images/UwU.jpg
-images/UwU2.jpg
 shader/ModelShader.h
 glad/glad.h
 src/objloader.cpp
@@ -21,6 +19,10 @@ header/controls.hpp
 src/buffer.cpp
 src/camera.cpp
 src/controls.cpp
+Texture.hpp 
+Texture.cpp
+stb.c
+stb.h
 )
 
 add_subdirectory(SDL dep/SDL)

@@ -8,7 +8,7 @@
 #define STBI_ONLY_BMP
 #define STBI_ONLY_GIF
 
-#include "stb_image.h"
+#include "header/stb_image.h"
 
 
 #ifdef __cplusplus
