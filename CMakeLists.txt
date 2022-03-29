@@ -2,10 +2,25 @@ cmake_minimum_required(VERSION 3.23)
 
 project(moteur)
 
-add_executable(moteur main.cpp gc_3d_defs.hpp Model.cpp Model.hpp Texture.hpp Texture.cpp
-shader/shader.hpp shader/loadShader.cpp 
-shader/TranformVertexShader.vertexshader.txt shader/SimpleFragmentShader.fragmentshader.txt 
-stb_image.h stb.c stb.h
+add_executable(moteur main.cpp
+gc_3d_defs.hpp
+shader/shader.hpp
+shader/loadShader.cpp
+shader/TranformVertexShader.vertexshader.txt
+shader/SimpleFragmentShader.fragmentshader.txt
+header/stb_image.h
+images/UwU.jpg
+images/UwU2.jpg
+shader/ModelShader.h
+glad/glad.h
+src/objloader.cpp
+header/objloader.hpp
+header/buffer.hpp
+header/camera.hpp
+header/controls.hpp
+src/buffer.cpp
+src/camera.cpp
+src/controls.cpp
 )
 
 add_subdirectory(SDL dep/SDL)
@@ -19,9 +34,14 @@ include(CMake/glew.cmake)
 set(IMGUI_USE_OGL3 true)
 include(CMake/imgui.cmake)
 
+include(CMake/assimp.cmake)
+
+
+
 target_include_directories(moteur PRIVATE 
 	${SDL_INCLUDE_DIR} 
 	${GLM_INCLUDE_DIR}
 	${IMGUI_INCLUDE_DIR}
 )
-target_link_libraries(moteur PRIVATE SDL2-static SDL2main opengl32 glew imgui)
+
+target_link_libraries(moteur PRIVATE SDL2-static SDL2main opengl32 glew imgui assimp)
