@@ -18,12 +18,20 @@ header/objloader.hpp
 header/buffer.hpp
 header/camera.hpp
 header/controls.hpp
+header/directorySnippet.h
 src/buffer.cpp
 src/camera.cpp
 src/controls.cpp
 )
 
 add_subdirectory(SDL dep/SDL)
+
+add_custom_target(copy_shader COMMAND ${CMAKE_COMMAND}
+-E copy_directory ${CMAKE_SOURCE_DIR}/shader $<TARGET_FILE_DIR:moteur>/shader)
+
+add_dependencies(moteur copy_shader)
+
+set_property(TARGET moteur PROPERTY CXX_STANDARD 17)
 
 
 set(SDL_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/SDL/include)

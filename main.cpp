@@ -16,6 +16,9 @@
 
 #include "header/objloader.hpp"
 
+#include <filesystem>
+#include "header/directorySnippet.h"
+
 
 
 
@@ -53,6 +56,12 @@ int	main(int argc, char* argv[]) {
 
 	//GLuint programID = LoadShaders("C:/Users/LenyN/Documents/GitHub/projet6/shader/TranformVertexShader.vertexshader.txt", "C:/Users/LenyN/Documents/GitHub/projet6/shader/SimpleFragmentShader.fragmentshader.txt");
 	GLuint programID = LoadShaders("C:/Users/LenyN/Documents/GitHub/projet6/shader/TranformVertexShader.vertexshader.txt", "C:/Users/LenyN/Documents/GitHub/projet6/shader/SimpleFragmentShader.fragmentshader.txt");
+
+	std::filesystem::path appPath(GetAppPath());
+	auto appDir = appPath.parent_path();
+	auto shaderPath = appDir / "shaders";
+	auto vShaderPath = shaderPath / "defaultVertexShader.glsl";
+	auto fShaderPath = shaderPath / "defaultFragmentShader.glsl";
 
 	//permet d'afficher la face avant mais pas la face derrière
 	//glEnable(GL_CULL_FACE);
