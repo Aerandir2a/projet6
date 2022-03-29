@@ -126,9 +126,10 @@ int	main(int argc, char* argv[]) {
 	//bool res = loadAssImp("C:/Users/LenyN/Documents/GitHub/projet6/objets3D/shibaUV.fbx", indices, vertices, uvs, normals);
 	Model ourModel("C:/Users/LenyN/Documents/GitHub/projet6/objets3D/shibaUV.fbx");
 
+
 	// build and compile shaders
 	// -------------------------
-	Shader ourShader("1.model_loading.vs", "1.model_loading.fs");
+	Shader ourShader("C:/Users/LenyN/Documents/GitHub/projet6/1.model_loading.vs", "C:/Users/LenyN/Documents/GitHub/projet6/1.model_loading.fs");
 
 	// Generate a buffer for the indices
 	GLuint elementbuffer;

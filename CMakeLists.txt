@@ -2,7 +2,8 @@ cmake_minimum_required(VERSION 3.23)
 
 project(moteur)
 
-add_executable(moteur main.cpp
+add_executable(moteur
+main.cpp
 gc_3d_defs.hpp
 shader/shader.hpp
 shader/loadShader.cpp
