@@ -320,6 +320,20 @@ int	main(int argc, char* argv[]) {
 
 			ImGui::SliderInt("Test", &slidertest, 1, 100000);
 
+			if (ImGui::Button("Objet + 1")) {
+				slidertest++;
+				printf("Objet + 1");
+			}
+
+			if (ImGui::Button("Objet - 1")) {
+				if (slidertest >= 1)
+				{
+					slidertest--;
+					printf("Objet - 1");
+				}
+
+			}
+
 			ImGui::End();
 
 			// Bind Buffer

@@ -12,9 +12,16 @@
 #include <assimp/scene.h>           // Output data structure
 #include <assimp/postprocess.h>     // Post processing flags
 
+/*
+struct Model
+{
+	Buffer* posBuffer;
+	bool mIsAdMat;
+	mat4 mPos;
+};
 
-
-
+std::vector<Model>
+*/
 
 bool loadAssImp
 (
@@ -36,6 +43,22 @@ bool loadAssImp
 	}
 	
 	const aiMesh* mesh = scene->mMeshes[0]; // In this simple example code we always use the 1rst mesh (in OBJ files there is often only one anyway)
+
+
+	/*
+	// Fill meshes
+	normals.reserve(scene->mNumMeshes);
+	for (unsigned int i = 0; i < scene->mNumMeshes; i++) {
+		aiVector3D pos = mesh->mNormals[i];
+		//vertices.push_back(glm::vec3(pos.x, pos.y, pos.z));
+	}
+
+	*/
+
+	
+
+	
+
 
 	// Fill vertices positions
 	vertices.reserve(mesh->mNumVertices);
