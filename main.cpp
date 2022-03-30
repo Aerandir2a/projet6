@@ -16,6 +16,12 @@
 
 #include "header/objloader.hpp"
 
+#include <filesystem>
+#include "header/directorySnippet.hpp"
+#include "shader/ModelShader.h"
+#include "header/model.h"
+#include "header/shader_.h"
+
 
 
 
@@ -51,8 +57,29 @@ int	main(int argc, char* argv[]) {
 	ImGui_ImplOpenGL3_Init();
 	ImGui::StyleColorsDark();
 
-	//GLuint programID = LoadShaders("C:/Users/lnicolas/Documents/GitHub/projet6/shader/TranformVertexShader.vertexshader.txt", "C:/Users/lnicolas/Documents/GitHub/projet6/shader/SimpleFragmentShader.fragmentshader.txt");
-	GLuint programID = LoadShaders("D:/LapendryFlorian/GitHub/projet6/shader/TranformVertexShader.vertexshader.txt", "D:/LapendryFlorian/GitHub/projet6/shader/SimpleFragmentShader.fragmentshader.txt");
+	std::filesystem::path appPath(GetAppPath());
+	auto appDir = appPath.parent_path();
+	auto shaderPath = appDir / "shader";
+	auto vShaderPath = shaderPath / "TranformVertexShader.vertexshader.txt";
+	auto fShaderPath = shaderPath / "SimpleFragmentShader.fragmentshader.txt";
+	auto vsShaderPath = shaderPath / "1.model_loading.vs";
+	auto fsShaderPath = shaderPath / "1.model_loading.fs";
+
+	auto ObjetPath = appDir / "objets3D";
+	auto Objet3DPath = ObjetPath / "shibaUV.fbx";
+	
+	std::string path_stringV{ vShaderPath.u8string() };
+	std::string path_stringF{ fShaderPath.u8string() };
+	std::string path_stringVS{ vShaderPath.u8string() };
+	std::string path_stringFS{ fShaderPath.u8string() };
+
+	std::string path_stringObjet{ Objet3DPath.u8string() };
+
+
+	//GLuint programID = LoadShaders("C:/Users/LenyN/Documents/GitHub/projet6/shader/TranformVertexShader.vertexshader.txt", "C:/Users/LenyN/Documents/GitHub/projet6/shader/SimpleFragmentShader.fragmentshader.txt");
+	GLuint programID = LoadShaders(path_stringV.c_str(), path_stringF.c_str());
+
+	
 
 	//permet d'afficher la face avant mais pas la face derrière
 	//glEnable(GL_CULL_FACE);
@@ -77,7 +104,7 @@ int	main(int argc, char* argv[]) {
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	// load and generate the texture
 	int width, height, nrChannels;
-	unsigned char* data = stbi_load("C:/Users/lnicolas/Documents/GitHub/projet6/images/portal.png", &width, &height, &nrChannels, 0);
+	unsigned char* data = stbi_load("C:/Users/LenyN/Documents/GitHub/projet6/images/portal.png", &width, &height, &nrChannels, 0);
 
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
@@ -101,7 +128,7 @@ int	main(int argc, char* argv[]) {
 	std::vector< glm::vec3 > vertices;
 	std::vector< glm::vec2 > uvs;
 	std::vector< glm::vec3 > normals; // Won't be used at the moment.
-	bool res = loadAssImp("C:/Users/lnicolas/Documents/GitHub/projet6/objets3D/FrogUV.fbx", indices, vertices, uvs, normals);
+	bool res = loadAssImp("C:/Users/LenyN/Documents/GitHub/projet6/objets3D/FrogUV.fbx", indices, vertices, uvs, normals);
 	*/
 
 	// Read our .obj file
@@ -109,7 +136,13 @@ int	main(int argc, char* argv[]) {
 	std::vector< glm::vec3 > vertices;
 	std::vector< glm::vec2 > uvs;
 	std::vector< glm::vec3 > normals; // Won't be used at the moment.
-	bool res = loadAssImp("D:/LapendryFlorian/GitHub/projet6/objets3D/shibaUV.fbx", indices, vertices, uvs, normals);
+	//bool res = loadAssImp("C:/Users/LenyN/Documents/GitHub/projet6/objets3D/shibaUV.fbx", indices, vertices, uvs, normals);
+	Model ourModel(path_stringObjet.c_str());
+
+
+	// build and compile shaders
+	// -------------------------
+	Shader ourShader(path_stringVS.c_str(), path_stringFS.c_str());
 
 	// Generate a buffer for the indices
 	GLuint elementbuffer;
@@ -143,9 +176,17 @@ int	main(int argc, char* argv[]) {
 	//glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
 	//glBufferData(GL_ARRAY_BUFFER, uvs.size() * sizeof(glm::vec2), uvs.data(), GL_STATIC_DRAW);
 
+	// Tableau de position des objets
+	std::vector<mat4> ModelMatrix = {
+		glm::translate(glm::identity<mat4>(), glm::vec3(0.0, 0.0, 0.0)),
+		//glm::translate(glm::identity<mat4>(), glm::vec3(2.5, 0.0, 0.0)),
+		//glm::translate(glm::identity<mat4>(), glm::vec3(-2.5, 4.0, 0.0)),
+		//glm::translate(glm::identity<mat4>(), glm::vec3(2.5, 4.0, 0.0)),
+	};
+
 	//Interaction avec la souris
-	int MousePosX = 1024/2;
-	int MousePosY = 768/2;
+	int MousePosX = 0;
+	int MousePosY = 0;
 	bool focus = true;
 	bool mouseClicRight = false;
 
@@ -161,29 +202,15 @@ int	main(int argc, char* argv[]) {
 
 	if (win != nullptr) {
 		SDL_WarpMouseInWindow(win, 1024 / 2, 768 / 2);
+		//computeMatricesFromInputs(curDirs, MousePosX, MousePosY);
 	}
 
-	//Camera Init
+	startPosCamera();
+
 	Camera* camera = new Camera();
 	camera->CreateCamera();
 
-	// Tableau de position des objets
-	std::vector<mat4> ModelMatrix;
-
-	//Init tableau d'Objet (64 000 objets soit 40x40x40)
-	int nMax = 40;
-	float scale = 5.0f; // Distance entre les objets
-	for (int i = 0; i < nMax; i++) { // Axe X
-		for (int j = 0; j < nMax; j++) { // Axe Y
-			for (int k = 0; k < nMax; k++) { // Axe Z
-				glm::vec3 pos =
-					i * scale * vec3(1.0f, 0.0f, 0.0f) +
-					j * scale * vec3(0.0f, 1.0f, 0.0f) +
-					k * scale * vec3(0.0f, 0.0f, -1.0f);
-				ModelMatrix.push_back(glm::translate(mat4(1.0f), pos));
-			}
-		}
-	}
+	
 
 	bool appRunning = true;
 	while (appRunning) {
@@ -192,7 +219,7 @@ int	main(int argc, char* argv[]) {
 		SDL_Event curEvent;
 		while (SDL_PollEvent(&curEvent))
 		{
-			if (curEvent.type == SDL_QUIT /* || curEvent.key.keysym.sym == SDLK_ESCAPE*/) {
+			if (curEvent.type == SDL_QUIT && curEvent.key.keysym.sym == SDLK_ESCAPE) {
 				return 0;
 			}
 
@@ -209,9 +236,8 @@ int	main(int argc, char* argv[]) {
 			}
 
 			if (curEvent.type == SDL_MOUSEMOTION) {
-				if (mouseClicRight) {	
-					SDL_GetMouseState(&MousePosX, &MousePosY);
-				}
+				SDL_GetMouseState(&MousePosX, &MousePosY);
+				//computeMatricesFromInputs(MousePosX, MousePosY);
 			}
 
 			if (curEvent.type == SDL_MOUSEBUTTONDOWN) {
@@ -269,6 +295,12 @@ int	main(int argc, char* argv[]) {
 			//glClear(GL_COLOR_BUFFER_BIT);
 			glUseProgram(programID);
 
+			//CAMERA
+			camera->UpdateCamera(win, curDirs, MousePosX, MousePosY, mouseClicRight);
+
+			// Matrix mvp
+			glm::mat4 mvp;
+
 			// Clear the screen
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -320,7 +352,71 @@ int	main(int argc, char* argv[]) {
 			/*if (ImGui::Button("Click Button!")) {
 				printf("Button clicked ");
 			}*/
-			ImGui::SliderInt("Test", &slidertest, 1, std::pow(nMax, 3));
+
+			ImGui::SliderInt("Test", &slidertest, 1, 100000);
+
+			if (ImGui::Button("+ 1")) {
+				slidertest++;
+				printf("Objet + 1 ");
+			}
+
+			ImGui::SameLine();
+
+			if (ImGui::Button("- 1")) {
+				if (slidertest > 1)
+				{
+					slidertest--;
+					printf("Objet - 1 ");
+				}
+
+			}
+
+			
+
+			if (ImGui::Button("+ 10")) {
+				slidertest = slidertest + 10;
+			}
+
+			ImGui::SameLine();
+
+			if (ImGui::Button("- 10")) {
+				if (slidertest > 10)
+				{
+					slidertest = slidertest - 10;
+				}
+
+			}
+
+
+			if (ImGui::Button("+ 100")) {
+				slidertest = slidertest + 100;
+			}
+
+			ImGui::SameLine();
+
+			if (ImGui::Button("- 100")) {
+				if (slidertest > 100)
+				{
+					slidertest = slidertest - 100;
+				}
+
+			}
+
+			if (ImGui::Button("+ 1000")) {
+				slidertest = slidertest + 1000;
+			}
+
+			ImGui::SameLine();
+
+			if (ImGui::Button("- 1000")) {
+				if (slidertest > 1000)
+				{
+					slidertest = slidertest - 1000;
+				}
+
+			}
+
+
 
 			ImGui::End();
 
@@ -363,36 +459,12 @@ int	main(int argc, char* argv[]) {
 				0,                                // stride
 				(void*)0                          // array buffer offset
 			);*/
-
-			//CAMERA
-			camera->UpdateCamera(win, curDirs, MousePosX, MousePosY, mouseClicRight);
-
-			// Matrix mvp
-			glm::mat4 mvp;
 			
-			// Afficher le nombre d'objet correspondant à la taille du tableau ModelMatrix
-			for (int i = 0; i < slidertest; i++) {
-				mvp = camera->ProjectionMatrix * camera->ViewMatrix * ModelMatrix[i];
-				GLuint MatrixID = glGetUniformLocation(programID, "MVP");
-				glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &mvp[0][0]);
-
-				// Index buffer
-				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementbuffer);
-
-				// Draw the triangles !
-				glDrawElements(
-					GL_TRIANGLES,      // mode
-					indices.size(),    // count
-					GL_UNSIGNED_SHORT,   // type
-					(void*)0           // element array buffer offset
-				);
-			}
 			// Draw the triangle !
 			//glDrawArrays(GL_TRIANGLES, 0, indices.size()); // Starting from vertex 0; 3 vertices total -> 1 triangle
 			//glDisableVertexAttribArray(0);
 
 
-			/*
 			// Afficher le nombre d'objet selon la valeur du slider
 			if (ModelMatrix.size() < slidertest) {
 				int diff = slidertest - ModelMatrix.size();
@@ -405,9 +477,7 @@ int	main(int argc, char* argv[]) {
 
 				ModelMatrix.resize(slidertest);
 			}
-			*/
-
-			/*
+			
 			// Afficher le nombre d'objet correspondant à la taille du tableau ModelMatrix
 			for (int i = 0; i < ModelMatrix.size(); i++) {
 				mvp = camera->ProjectionMatrix * camera->ViewMatrix * ModelMatrix[i];
@@ -425,7 +495,13 @@ int	main(int argc, char* argv[]) {
 					(void*)0           // element array buffer offset
 				);
 			}
-			*/
+
+			// render the loaded model
+			glm::mat4 model = glm::mat4(1.0f);
+			model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f)); // translate it down so it's at the center of the scene
+			model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));	// it's a bit too big for our scene, so scale it down
+			ourShader.setMat4("model", model);
+			ourModel.Draw(ourShader);
 			
 
 			// Enable depth test
