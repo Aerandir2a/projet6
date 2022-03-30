@@ -19,4 +19,4 @@ glm::mat4 getViewMatrix();
 glm::mat4 getProjectionMatrix();
 void moveCamera(Dirs const& iDirs);
 void iPosMouse(int xpos, int ypos);
-void startPosCamera();
+//void startPosCamera();

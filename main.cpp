@@ -177,12 +177,7 @@ int	main(int argc, char* argv[]) {
 	//glBufferData(GL_ARRAY_BUFFER, uvs.size() * sizeof(glm::vec2), uvs.data(), GL_STATIC_DRAW);
 
 	// Tableau de position des objets
-	std::vector<mat4> ModelMatrix = {
-		glm::translate(glm::identity<mat4>(), glm::vec3(0.0, 0.0, 0.0)),
-		//glm::translate(glm::identity<mat4>(), glm::vec3(2.5, 0.0, 0.0)),
-		//glm::translate(glm::identity<mat4>(), glm::vec3(-2.5, 4.0, 0.0)),
-		//glm::translate(glm::identity<mat4>(), glm::vec3(2.5, 4.0, 0.0)),
-	};
+	std::vector<mat4> ModelMatrix;
 
 	//Interaction avec la souris
 	int MousePosX = 0;
@@ -205,12 +200,23 @@ int	main(int argc, char* argv[]) {
 		//computeMatricesFromInputs(curDirs, MousePosX, MousePosY);
 	}
 
-	startPosCamera();
-
 	Camera* camera = new Camera();
 	camera->CreateCamera();
 
-	
+	//Init tableau d'Objet (64 000 objets soit 40x40x40)
+	int nMax = 40;
+	float scale = 5.0f; // Distance entre les objets
+	for (int i = 0; i < nMax; i++) { // Axe X
+		for (int j = 0; j < nMax; j++) { // Axe Y
+			for (int k = 0; k < nMax; k++) { // Axe Z
+				glm::vec3 pos =
+					i * scale * vec3(1.0f, 0.0f, 0.0f) +
+					j * scale * vec3(0.0f, 1.0f, 0.0f) +
+					k * scale * vec3(0.0f, 0.0f, -1.0f);
+				ModelMatrix.push_back(glm::translate(mat4(1.0f), pos));
+			}
+		}
+	}
 
 	bool appRunning = true;
 	while (appRunning) {
@@ -295,12 +301,6 @@ int	main(int argc, char* argv[]) {
 			//glClear(GL_COLOR_BUFFER_BIT);
 			glUseProgram(programID);
 
-			//CAMERA
-			camera->UpdateCamera(win, curDirs, MousePosX, MousePosY, mouseClicRight);
-
-			// Matrix mvp
-			glm::mat4 mvp;
-
 			// Clear the screen
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -340,7 +340,6 @@ int	main(int argc, char* argv[]) {
 			ImGui::LabelText("", "Time (s) : %f", elapsedSeconds * 1e-0);
 			ImGui::LabelText("", "ms/frame : %f", msFrames);
 			ImGui::LabelText("", "FPS : %f", FPS);
-			ImGui::LabelText("", "Valeur Slider : Test : %i", slidertest);
 
 			ImGui::End();
 
@@ -353,7 +352,7 @@ int	main(int argc, char* argv[]) {
 				printf("Button clicked ");
 			}*/
 
-			ImGui::SliderInt("Test", &slidertest, 1, 100000);
+			ImGui::SliderInt("Number object", &slidertest, 1, 64000);
 
 			if (ImGui::Button("+ 1")) {
 				slidertest++;
@@ -464,22 +463,14 @@ int	main(int argc, char* argv[]) {
 			//glDrawArrays(GL_TRIANGLES, 0, indices.size()); // Starting from vertex 0; 3 vertices total -> 1 triangle
 			//glDisableVertexAttribArray(0);
 
+			//CAMERA
+			camera->UpdateCamera(win, curDirs, MousePosX, MousePosY, mouseClicRight);
 
-			// Afficher le nombre d'objet selon la valeur du slider
-			if (ModelMatrix.size() < slidertest) {
-				int diff = slidertest - ModelMatrix.size();
-				for (int i = 0; i < diff; i++) {
-					glm::mat4 const& lastVec = ModelMatrix.back();
-					ModelMatrix.push_back(glm::translate(lastVec, glm::vec3(0.0, 4.0, 0.0)));
-				}
-			}
-			if (ModelMatrix.size() > slidertest) {
-
-				ModelMatrix.resize(slidertest);
-			}
+			// Matrix mvp
+			glm::mat4 mvp;
 			
 			// Afficher le nombre d'objet correspondant à la taille du tableau ModelMatrix
-			for (int i = 0; i < ModelMatrix.size(); i++) {
+			for (int i = 0; i < slidertest; i++) {
 				mvp = camera->ProjectionMatrix * camera->ViewMatrix * ModelMatrix[i];
 				GLuint MatrixID = glGetUniformLocation(programID, "MVP");
 				glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &mvp[0][0]);
@@ -503,9 +494,7 @@ int	main(int argc, char* argv[]) {
 			//glm::mat4 model = glm::mat4(1.0f);
 			//model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f)); // translate it down so it's at the center of the scene
 			//model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));	// it's a bit too big for our scene, so scale it down
-			//ourShader.setMat4("model", ModelMatrix[0]);
-			//ourModel.Draw(ourShader);
-			
+						
 
 			// Enable depth test
 			glEnable(GL_DEPTH_TEST);
