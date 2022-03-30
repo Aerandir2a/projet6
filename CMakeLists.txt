@@ -45,6 +45,11 @@ add_custom_target(copy_objets3D COMMAND ${CMAKE_COMMAND}
 
 add_dependencies(moteur copy_objets3D)
 
+add_custom_target(copy_images COMMAND ${CMAKE_COMMAND}
+-E copy_directory ${CMAKE_SOURCE_DIR}/images $<TARGET_FILE_DIR:moteur>/images)
+
+add_dependencies(moteur copy_images)
+
 set_property(TARGET moteur PROPERTY CXX_STANDARD 17)
 
 

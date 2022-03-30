@@ -3,7 +3,7 @@
 #include "stb.h"
 #include "Texture.hpp"
 
-void Texture::LoadTextureGif(char* path) {
+void Texture::LoadTextureGif(const char* path) {
 
 	glGenTextures(1, &texture);
 	glBindTexture(GL_TEXTURE_2D_ARRAY, texture);
@@ -29,7 +29,7 @@ void Texture::LoadTextureGif(char* path) {
 
 }
 
-void Texture::LoadTexture2D(char* path) {
+void Texture::LoadTexture2D(const char* path) {
 
 	glGenTextures(1, &texture);
 	glBindTexture(GL_TEXTURE_2D, texture);

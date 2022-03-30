@@ -22,8 +22,8 @@ public:
 	unsigned char* data;
 	GLuint texture;
 	Timestamp timergif;
-	void LoadTextureGif(char* path);
-	void LoadTexture2D(char* path);
+	void LoadTextureGif(const char* path);
+	void LoadTexture2D(const char* path);
 	static void GifTick(Texture tex, GLuint lay, int* frame);
 	//static void GifTick(int* frame, int* frameOfGif, int* inAnimation, GLuint tex, GLuint lay, Texture tx1, Texture tx2);
 };
