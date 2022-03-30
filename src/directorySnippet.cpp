@@ -1,11 +1,6 @@
-#pragma once 
-
-#include <string_view>
-std::string_view GetAppPath();
-
-// In a cpp
 #if WIN32
 #include <Windows.h>
+#include "../header/directorySnippet.hpp"
 #endif
 
 namespace

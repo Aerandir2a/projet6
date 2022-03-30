@@ -17,7 +17,7 @@
 #include "header/objloader.hpp"
 
 #include <filesystem>
-#include "header/directorySnippet.h"
+#include "header/directorySnippet.hpp"
 #include "shader/ModelShader.h"
 #include "header/model.h"
 #include "header/shader_.h"
@@ -59,12 +59,25 @@ int	main(int argc, char* argv[]) {
 
 	std::filesystem::path appPath(GetAppPath());
 	auto appDir = appPath.parent_path();
-	auto shaderPath = appDir / "shaders";
-	auto vShaderPath = shaderPath / "defaultVertexShader.glsl";
-	auto fShaderPath = shaderPath / "defaultFragmentShader.glsl";
+	auto shaderPath = appDir / "shader";
+	auto vShaderPath = shaderPath / "TranformVertexShader.vertexshader.txt";
+	auto fShaderPath = shaderPath / "SimpleFragmentShader.fragmentshader.txt";
+	auto vsShaderPath = shaderPath / "1.model_loading.vs";
+	auto fsShaderPath = shaderPath / "1.model_loading.fs";
+
+	auto ObjetPath = appDir / "objets3D";
+	auto Objet3DPath = ObjetPath / "shibaUV.fbx";
+	
+	std::string path_stringV{ vShaderPath.u8string() };
+	std::string path_stringF{ fShaderPath.u8string() };
+	std::string path_stringVS{ vShaderPath.u8string() };
+	std::string path_stringFS{ fShaderPath.u8string() };
+
+	std::string path_stringObjet{ Objet3DPath.u8string() };
+
 
 	//GLuint programID = LoadShaders("C:/Users/LenyN/Documents/GitHub/projet6/shader/TranformVertexShader.vertexshader.txt", "C:/Users/LenyN/Documents/GitHub/projet6/shader/SimpleFragmentShader.fragmentshader.txt");
-	GLuint programID = LoadShaders("C:/Users/LenyN/Documents/GitHub/projet6/shader/TranformVertexShader.vertexshader.txt", "C:/Users/LenyN/Documents/GitHub/projet6/shader/SimpleFragmentShader.fragmentshader.txt");
+	GLuint programID = LoadShaders(path_stringV.c_str(), path_stringF.c_str());
 
 	
 
@@ -124,12 +137,12 @@ int	main(int argc, char* argv[]) {
 	std::vector< glm::vec2 > uvs;
 	std::vector< glm::vec3 > normals; // Won't be used at the moment.
 	//bool res = loadAssImp("C:/Users/LenyN/Documents/GitHub/projet6/objets3D/shibaUV.fbx", indices, vertices, uvs, normals);
-	Model ourModel("C:/Users/LenyN/Documents/GitHub/projet6/objets3D/shibaUV.fbx");
+	Model ourModel(path_stringObjet.c_str());
 
 
 	// build and compile shaders
 	// -------------------------
-	Shader ourShader("C:/Users/LenyN/Documents/GitHub/projet6/1.model_loading.vs", "C:/Users/LenyN/Documents/GitHub/projet6/1.model_loading.fs");
+	Shader ourShader(path_stringVS.c_str(), path_stringFS.c_str());
 
 	// Generate a buffer for the indices
 	GLuint elementbuffer;
