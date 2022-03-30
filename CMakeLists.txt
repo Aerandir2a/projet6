@@ -2,12 +2,15 @@ cmake_minimum_required(VERSION 3.23)
 
 project(moteur)
 
-add_executable(moteur main.cpp
+add_executable(moteur
+main.cpp
 gc_3d_defs.hpp
 shader/shader.hpp
 shader/loadShader.cpp
 shader/TranformVertexShader.vertexshader.txt
 shader/SimpleFragmentShader.fragmentshader.txt
+1.model_loading.fs
+1.model_loading.vs
 header/stb_image.h
 shader/ModelShader.h
 glad/glad.h
@@ -16,6 +19,10 @@ header/objloader.hpp
 header/buffer.hpp
 header/camera.hpp
 header/controls.hpp
+header/directorySnippet.h
+header/mesh.h
+header/model.h
+header/shader_.h
 src/buffer.cpp
 src/camera.cpp
 src/controls.cpp
@@ -27,8 +34,18 @@ stb.h
 
 add_subdirectory(SDL dep/SDL)
 
+add_custom_target(copy_shader COMMAND ${CMAKE_COMMAND}
+-E copy_directory ${CMAKE_SOURCE_DIR}/shader $<TARGET_FILE_DIR:moteur>/shader)
+
+add_dependencies(moteur copy_shader)
+
+set_property(TARGET moteur PROPERTY CXX_STANDARD 17)
+
+
 set(SDL_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/SDL/include)
 set(GLM_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/dep/glm)
+set(ASSIMP_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/dep/assimp)
+set(IMGUI_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/dep/imgui)
 
 
 include(CMake/glew.cmake)

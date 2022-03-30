@@ -5,15 +5,23 @@
 #endif
 #include"gc_3d_defs.hpp"
 #include"shader/shader.hpp"
+#define STB_IMAGE_IMPLEMENTATION
+#include "header/stb_image.h"
 #include "header/buffer.hpp"
 #include "header/controls.hpp"
 #include "header/camera.hpp"
 #include "dep/imgui/imgui.h"
 #include "dep/imgui/backends/imgui_impl_opengl3.h"
 #include "dep/imgui/backends/imgui_impl_sdl.h"
+
 #include "header/objloader.hpp"
-#include "Texture.hpp"
-#include "stb.h"
+
+#include <filesystem>
+#include "header/directorySnippet.h"
+#include "shader/ModelShader.h"
+#include "header/model.h"
+#include "header/shader_.h"
+
 
 
 
@@ -49,8 +57,16 @@ int	main(int argc, char* argv[]) {
 	ImGui_ImplOpenGL3_Init();
 	ImGui::StyleColorsDark();
 
-	//GLuint programID = LoadShaders("C:/Users/lnicolas/Documents/GitHub/projet6/shader/TranformVertexShader.vertexshader.txt", "C:/Users/lnicolas/Documents/GitHub/projet6/shader/SimpleFragmentShader.fragmentshader.txt");
-	GLuint programID = LoadShaders("D:/users/ppiglioni/projet6/shader/TranformVertexShader.vertexshader.txt", "D:/users/ppiglioni/projet6/shader/SimpleFragmentShader.fragmentshader.txt");
+	std::filesystem::path appPath(GetAppPath());
+	auto appDir = appPath.parent_path();
+	auto shaderPath = appDir / "shaders";
+	auto vShaderPath = shaderPath / "defaultVertexShader.glsl";
+	auto fShaderPath = shaderPath / "defaultFragmentShader.glsl";
+
+	//GLuint programID = LoadShaders("C:/Users/LenyN/Documents/GitHub/projet6/shader/TranformVertexShader.vertexshader.txt", "C:/Users/LenyN/Documents/GitHub/projet6/shader/SimpleFragmentShader.fragmentshader.txt");
+	GLuint programID = LoadShaders("C:/Users/LenyN/Documents/GitHub/projet6/shader/TranformVertexShader.vertexshader.txt", "C:/Users/LenyN/Documents/GitHub/projet6/shader/SimpleFragmentShader.fragmentshader.txt");
+
+	
 
 	//permet d'afficher la face avant mais pas la face derrière
 	//glEnable(GL_CULL_FACE);
@@ -61,13 +77,7 @@ int	main(int argc, char* argv[]) {
 	//GLuint MatrixID = glGetUniformLocation(programID, "MVP");
 
 	GLuint TextureID = glGetUniformLocation(programID, "myTextureSampler");
-	GLuint LayerID = glGetUniformLocation(programID, "layer");
-	
-	Texture t1;
-	t1.LoadTexture2D("D:/users/ppiglioni/projet6/images/UwU2.jpg");
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D_ARRAY, t1.texture);
-	glUniform1i(TextureID, 0);
+
 
 	/*
 
@@ -81,7 +91,7 @@ int	main(int argc, char* argv[]) {
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	// load and generate the texture
 	int width, height, nrChannels;
-	unsigned char* data = stbi_load("C:/Users/lnicolas/Documents/GitHub/projet6/images/portal.png", &width, &height, &nrChannels, 0);
+	unsigned char* data = stbi_load("C:/Users/LenyN/Documents/GitHub/projet6/images/portal.png", &width, &height, &nrChannels, 0);
 
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
@@ -105,15 +115,21 @@ int	main(int argc, char* argv[]) {
 	std::vector< glm::vec3 > vertices;
 	std::vector< glm::vec2 > uvs;
 	std::vector< glm::vec3 > normals; // Won't be used at the moment.
-	bool res = loadAssImp("C:/Users/lnicolas/Documents/GitHub/projet6/objets3D/FrogUV.fbx", indices, vertices, uvs, normals);
+	bool res = loadAssImp("C:/Users/LenyN/Documents/GitHub/projet6/objets3D/FrogUV.fbx", indices, vertices, uvs, normals);
 	*/
 
 	// Read our .obj file
 	std::vector<unsigned short> indices;
 	std::vector< glm::vec3 > vertices;
 	std::vector< glm::vec2 > uvs;
-	std::vector< glm::vec3 > normals; // Won't be used at the moment.shibaUV.fbx
-	bool res = loadAssImp("D:/users/ppiglioni/projet6/objets3D/cubeObjet.obj", indices, vertices, uvs, normals);
+	std::vector< glm::vec3 > normals; // Won't be used at the moment.
+	//bool res = loadAssImp("C:/Users/LenyN/Documents/GitHub/projet6/objets3D/shibaUV.fbx", indices, vertices, uvs, normals);
+	Model ourModel("C:/Users/LenyN/Documents/GitHub/projet6/objets3D/shibaUV.fbx");
+
+
+	// build and compile shaders
+	// -------------------------
+	Shader ourShader("C:/Users/LenyN/Documents/GitHub/projet6/1.model_loading.vs", "C:/Users/LenyN/Documents/GitHub/projet6/1.model_loading.fs");
 
 	// Generate a buffer for the indices
 	GLuint elementbuffer;
@@ -170,8 +186,7 @@ int	main(int argc, char* argv[]) {
 	auto lastTime = Clock::now();
 	auto time = Clock::now();
 	auto DebutFrame = Clock::now();
-	int frame = 0;
-	
+
 	if (win != nullptr) {
 		SDL_WarpMouseInWindow(win, 1024 / 2, 768 / 2);
 		//computeMatricesFromInputs(curDirs, MousePosX, MousePosY);
@@ -181,6 +196,8 @@ int	main(int argc, char* argv[]) {
 
 	Camera* camera = new Camera();
 	camera->CreateCamera();
+
+	
 
 	bool appRunning = true;
 	while (appRunning) {
@@ -325,9 +342,70 @@ int	main(int argc, char* argv[]) {
 
 			ImGui::SliderInt("Test", &slidertest, 1, 100000);
 
-			ImGui::End();
+			if (ImGui::Button("+ 1")) {
+				slidertest++;
+				printf("Objet + 1 ");
+			}
 
-			Texture::GifTick(t1, LayerID, &frame);
+			ImGui::SameLine();
+
+			if (ImGui::Button("- 1")) {
+				if (slidertest > 1)
+				{
+					slidertest--;
+					printf("Objet - 1 ");
+				}
+
+			}
+
+			
+
+			if (ImGui::Button("+ 10")) {
+				slidertest = slidertest + 10;
+			}
+
+			ImGui::SameLine();
+
+			if (ImGui::Button("- 10")) {
+				if (slidertest > 10)
+				{
+					slidertest = slidertest - 10;
+				}
+
+			}
+
+
+			if (ImGui::Button("+ 100")) {
+				slidertest = slidertest + 100;
+			}
+
+			ImGui::SameLine();
+
+			if (ImGui::Button("- 100")) {
+				if (slidertest > 100)
+				{
+					slidertest = slidertest - 100;
+				}
+
+			}
+
+			if (ImGui::Button("+ 1000")) {
+				slidertest = slidertest + 1000;
+			}
+
+			ImGui::SameLine();
+
+			if (ImGui::Button("- 1000")) {
+				if (slidertest > 1000)
+				{
+					slidertest = slidertest - 1000;
+				}
+
+			}
+
+
+
+			ImGui::End();
 
 			// Bind Buffer
 			Vbuffer->BindBuffer(0, 3);
@@ -404,6 +482,13 @@ int	main(int argc, char* argv[]) {
 					(void*)0           // element array buffer offset
 				);
 			}
+
+			// render the loaded model
+			glm::mat4 model = glm::mat4(1.0f);
+			model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f)); // translate it down so it's at the center of the scene
+			model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));	// it's a bit too big for our scene, so scale it down
+			ourShader.setMat4("model", model);
+			ourModel.Draw(ourShader);
 			
 
 			// Enable depth test
@@ -421,3 +506,136 @@ int	main(int argc, char* argv[]) {
 
 	return 0;
 }
+
+/*void old() {
+	auto time = Clock::now(); // à mettre avant le double while
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glEnable(GL_DEPTH_TEST);
+	glDepthMask(GL_TRUE);
+	glEnable(GL_LIGHTING);
+	glEnable(GL_LIGHT0);
+	GLfloat ambientLightFull[] = { 1.0f, 0.25f, 0.20f, 0.0f };
+	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, ambientLightFull);
+	float gray[] = { 0.75f, 0.75f, 0.75f, 1.0f };
+	glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, gray);
+
+	const float radius = 0.5;
+
+	auto curTime = Clock::now();
+	std::chrono::duration<float> fTime = curTime - time;
+	float camX = sin(fTime.count()) * radius;
+	float camZ = cos(fTime.count()) * radius;
+
+	vec3 cameraTarget = vec3(0.0, 0.0, -2.0);
+
+	vec3 cameraPos = cameraTarget - 4.0f * vec3(camX, -0.5, camZ);
+
+	// Creation de la camera
+	mat4 view;
+	view = lookAt(cameraPos, //Position de la camera
+		cameraTarget, //Cible à regarder
+		vec3(0.0, 1.0, 0.0)); //position vertical
+	mat4 camFrustum = frustum(-1.0, 1.0, -1.0, 1.0, 1.0, 1000.0);
+
+	glMatrixMode(GL_PROJECTION);
+	glLoadMatrixf(&camFrustum[0][0]);
+
+	glMatrixMode(GL_MODELVIEW);
+	glLoadMatrixf(&view[0][0]);
+
+	glTranslatef(0.0, 0.0, -2.0);
+
+	vec3 p0 = vec3(-1.0, -1.0, 1.0);
+	vec3 p1 = vec3(-1.0, 1.0, 1.0);
+	vec3 p2 = vec3(1.0, 1.0, 1.0);
+	vec3 p3 = vec3(1.0, -1.0, 1.0);
+	vec3 p4 = vec3(-1.0, -1.0, -1.0);
+	vec3 p5 = vec3(-1.0, 1.0, -1.0);
+	vec3 p6 = vec3(1.0, 1.0, -1.0);
+	vec3 p7 = vec3(1.0, -1.0, -1.0);
+
+	Geometry test;
+
+
+	test.m_Pos = {
+		p0,p1,p2,p3,
+		p0,p1,p4,p5,
+		p4,p5,p6,p7,
+		p7,p6,p2,p3,
+		p0,p3,p4,p7,
+		p1,p2,p5,p6
+	};
+
+	test.m_Normals = {
+		vec3(0.0,0.0,1.0),vec3(0.0,0.0,1.0),vec3(0.0,0.0,1.0),vec3(0.0,0.0,1.0),
+		vec3(-1.0,0.0,0.0),vec3(-1.0,0.0,0.0),vec3(-1.0,0.0,0.0),vec3(-1.0,0.0,0.0),
+		vec3(0.0,0.0,-1.0),vec3(0.0,0.0,-1.0),vec3(0.0,0.0,-1.0),vec3(0.0,0.0,-1.0),
+		vec3(1.0,0.0,0.0),vec3(1.0,0.0,0.0),vec3(1.0,0.0,0.0),vec3(1.0,0.0,0.0),
+		vec3(0.0,-1.0,0.0),vec3(0.0,-1.0,0.0),vec3(0.0,-1.0,0.0),vec3(0.0,-1.0,0.0),
+		vec3(0.0,1.0,0.0),vec3(0.0,1.0,0.0),vec3(0.0,1.0,0.0),vec3(0.0,1.0,0.0),
+	};
+
+	test.m_Indices = {
+		0,1,2,0,2,3,
+		4,5,6,5,6,7,
+		8,9,10,8,10,11,
+		12,13,14,12,14,15,
+		16,17,18,16,18,19,
+		20,21,22,21,22,23
+	};
+
+	test.Bind();
+	test.Draw();
+
+	glBegin(GL_TRIANGLES);
+	//Front
+	glColor4f(0.0, 1.0, 0.0, 1.0);
+	glVertex3f(-1.0f, -1.0f, 1.0f);
+	glVertex3f(1.0f, -1.0f, 1.0f);
+	glVertex3f(1.0f, 1.0f, 1.0f);
+	glVertex3f(-1.0f, -1.0f, 1.0f);
+	glVertex3f(-1.0f, 1.0f, 1.0f);
+	glVertex3f(1.0f, 1.0f, 1.0f);
+	//left
+	glColor4f(0.0, 0.0, 1.0, 1.0);
+	glVertex3f(-1.0f, -1.0f, 1.0f);
+	glVertex3f(-1.0f, -1.0f, -1.0f);
+	glVertex3f(-1.0f, 1.0f, 1.0f);
+	glVertex3f(-1.0f, 1.0f, 1.0f);
+	glVertex3f(-1.0f, 1.0f, -1.0f);
+	glVertex3f(-1.0f, -1.0f, -1.0f);
+	//right
+	glColor4f(0.0, 1.0, 1.0, 1.0);
+	glVertex3f(1.0f, -1.0f, 1.0f);
+	glVertex3f(1.0f, -1.0f, -1.0f);
+	glVertex3f(1.0f, 1.0f, 1.0f);
+	glVertex3f(1.0f, 1.0f, 1.0f);
+	glVertex3f(1.0f, 1.0f, -1.0f);
+	glVertex3f(1.0f, -1.0f, -1.0f);
+	//back
+	glColor4f(1.0, 0.0, 0.0, -1.0);
+	glVertex3f(-1.0f, -1.0f, -1.0f);
+	glVertex3f(1.0f, -1.0f, -1.0f);
+	glVertex3f(1.0f, 1.0f, -1.0f);
+	glVertex3f(-1.0f, -1.0f, -1.0f);
+	glVertex3f(-1.0f, 1.0f, -1.0f);
+	glVertex3f(1.0f, 1.0f, -1.0f);
+	//top
+	glColor4f(1.0, 0.0, 1.0, -1.0);
+	glVertex3f(-1.0f, 1.0f, 1.0f);
+	glVertex3f(-1.0f, 1.0f, -1.0f);
+	glVertex3f(1.0f, 1.0f, 1.0f);
+	glVertex3f(1.0f, 1.0f, 1.0f);
+	glVertex3f(1.0f, 1.0f, -1.0f);
+	glVertex3f(-1.0f, 1.0f, -1.0f);
+	//bot
+	glColor4f(1.0, 1.0, 0.0, -1.0);
+	glVertex3f(-1.0f, -1.0f, 1.0f);
+	glVertex3f(-1.0f, -1.0f, -1.0f);
+	glVertex3f(1.0f, -1.0f, 1.0f);
+	glVertex3f(1.0f, -1.0f, 1.0f);
+	glVertex3f(1.0f, -1.0f, -1.0f);
+	glVertex3f(-1.0f, -1.0f, -1.0f);
+
+	glEnd();
+}*/
