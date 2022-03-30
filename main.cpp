@@ -205,12 +205,8 @@ int	main(int argc, char* argv[]) {
 		//computeMatricesFromInputs(curDirs, MousePosX, MousePosY);
 	}
 
-	startPosCamera();
-
 	Camera* camera = new Camera();
 	camera->CreateCamera();
-
-	
 
 	bool appRunning = true;
 	while (appRunning) {
@@ -294,12 +290,6 @@ int	main(int argc, char* argv[]) {
 
 			//glClear(GL_COLOR_BUFFER_BIT);
 			glUseProgram(programID);
-
-			//CAMERA
-			camera->UpdateCamera(win, curDirs, MousePosX, MousePosY, mouseClicRight);
-
-			// Matrix mvp
-			glm::mat4 mvp;
 
 			// Clear the screen
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -464,6 +454,11 @@ int	main(int argc, char* argv[]) {
 			//glDrawArrays(GL_TRIANGLES, 0, indices.size()); // Starting from vertex 0; 3 vertices total -> 1 triangle
 			//glDisableVertexAttribArray(0);
 
+			//CAMERA
+			camera->UpdateCamera(win, curDirs, MousePosX, MousePosY, mouseClicRight);
+
+			// Matrix mvp
+			glm::mat4 mvp;
 
 			// Afficher le nombre d'objet selon la valeur du slider
 			if (ModelMatrix.size() < slidertest) {
