@@ -484,6 +484,9 @@ int	main(int argc, char* argv[]) {
 				GLuint MatrixID = glGetUniformLocation(programID, "MVP");
 				glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &mvp[0][0]);
 
+				ourShader.setMat4("model", ModelMatrix[i]);
+				ourModel.Draw(ourShader);
+
 				// Index buffer
 				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementbuffer);
 
@@ -497,11 +500,11 @@ int	main(int argc, char* argv[]) {
 			}
 
 			// render the loaded model
-			glm::mat4 model = glm::mat4(1.0f);
-			model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f)); // translate it down so it's at the center of the scene
-			model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));	// it's a bit too big for our scene, so scale it down
-			ourShader.setMat4("model", model);
-			ourModel.Draw(ourShader);
+			//glm::mat4 model = glm::mat4(1.0f);
+			//model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f)); // translate it down so it's at the center of the scene
+			//model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));	// it's a bit too big for our scene, so scale it down
+			//ourShader.setMat4("model", ModelMatrix[0]);
+			//ourModel.Draw(ourShader);
 			
 
 			// Enable depth test
