@@ -163,8 +163,6 @@ int	main(int argc, char* argv[]) {
 		SDL_WarpMouseInWindow(win, 1024 / 2, 768 / 2);
 	}
 
-	//startPosCamera();
-
 	//Camera Init
 	Camera* camera = new Camera();
 	camera->CreateCamera();
@@ -271,12 +269,6 @@ int	main(int argc, char* argv[]) {
 			//glClear(GL_COLOR_BUFFER_BIT);
 			glUseProgram(programID);
 
-			//CAMERA
-			camera->UpdateCamera(win, curDirs, MousePosX, MousePosY, mouseClicRight);
-
-			// Matrix mvp
-			glm::mat4 mvp;
-
 			// Clear the screen
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -371,6 +363,12 @@ int	main(int argc, char* argv[]) {
 				0,                                // stride
 				(void*)0                          // array buffer offset
 			);*/
+
+			//CAMERA
+			camera->UpdateCamera(win, curDirs, MousePosX, MousePosY, mouseClicRight);
+
+			// Matrix mvp
+			glm::mat4 mvp;
 			
 			// Afficher le nombre d'objet correspondant à la taille du tableau ModelMatrix
 			for (int i = 0; i < slidertest; i++) {

@@ -119,7 +119,7 @@ void computeMatricesFromInputs()
 	prevTime = curTime;
 }
 
-void startPosCamera() {
+/*void startPosCamera() {
 	auto curTime = GC_3D::Clock::now();
 	GC_3D::Duration deltaTime = curTime - prevTime;
 
@@ -154,4 +154,4 @@ void startPosCamera() {
 
 	// For the next frame, the "last time" will be "now"
 	prevTime = curTime;
-}
+}*/
