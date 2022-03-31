@@ -67,23 +67,23 @@ int	main(int argc, char* argv[]) {
 	auto fsShaderPath = shaderPath / "1.model_loading.fs";
 
 	auto ObjetPath = appDir / "objets3D";
-	auto Objet3DPath_Shiba = ObjetPath / "shibaUV.fbx";
+	auto Objet3DPath_Shiba = ObjetPath / "shibaTexture.fbx";
 	auto Objet3DPath_Frog = ObjetPath / "FrogUV.fbx";
 	auto Objet3DPath_Banana = ObjetPath / "Banana.obj";
 	auto Objet3DPath_Snake = ObjetPath / "Snake_angry.fbx";
 
 	auto Objet3DPath_Crab = ObjetPath / "crab.obj";
 	auto Objet3DPath_Deer = ObjetPath / "deer.obj";
-	auto Objet3DPath_Pub = ObjetPath / "cube.obj";
+	auto Objet3DPath_Pub = ObjetPath / "plane.fbx";
 
 	auto imagePath = appDir / "images";
 	auto image_PathGif = imagePath / "Mmmh_sun.gif";
 	auto image_PathGif2 = imagePath / "UwU3.gif";
-	auto image_Path = imagePath / "Crab_Texture.png";
-	auto image_PathDeer = imagePath / "Deer_Texture.png";
+	auto image_Path = imagePath / "TextureShiba.png";
+	auto image_PathCrab = imagePath / "Crab_Texture.png";
 
 	std::string path_stringImage{ image_Path.u8string() };
-	std::string path_stringImageDeer{ image_PathDeer.u8string() };
+	std::string path_stringImageCrab{ image_PathCrab.u8string() };
 	std::string path_stringGif{ image_PathGif.u8string() };
 	std::string path_stringGif2{ image_PathGif2.u8string() };
 
@@ -115,7 +115,7 @@ int	main(int argc, char* argv[]) {
 	glBindTexture(GL_TEXTURE_2D, t2.texture);
 
 	Texture t3;
-	t2.LoadTexture2D(path_stringImageDeer.c_str());
+	t2.LoadTexture2D(path_stringImageCrab.c_str());
 	glActiveTexture(GL_TEXTURE2);
 	glBindTexture(GL_TEXTURE_2D, t3.texture);
 
@@ -230,13 +230,13 @@ int	main(int argc, char* argv[]) {
 		
 		if (!ChangeMesh)
 		{
-			ModelMesh.push_back(&ourModel_Crab);
+			ModelMesh.push_back(&ourModel_Shiba);
 			ChangeMesh = true;
 			
 		}
 		else if (ChangeMesh)
 		{
-			ModelMesh.push_back(&ourModel_Deer);
+			ModelMesh.push_back(&ourModel_Crab);
 			ChangeMesh = false;
 			
 		}
@@ -383,7 +383,7 @@ int	main(int argc, char* argv[]) {
 			// Changement de Mesh
 			ImGui::Begin("Mesh");
 
-			if (ImGui::Button("Change")) {
+			if (ImGui::Button("Change Mesh")) {
 				if (test)
 				{
 					glUseProgram(programID);
