@@ -18,12 +18,14 @@ header/buffer.hpp
 header/camera.hpp
 header/controls.hpp
 header/directorySnippet.hpp
+header/table.hpp
 header/mesh.h
 header/model.h
 header/shader_.h
 src/buffer.cpp
 src/camera.cpp
 src/controls.cpp
+src/table.cpp
 Texture.hpp 
 Texture.cpp
 stb.c
