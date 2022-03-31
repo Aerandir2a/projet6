@@ -14,7 +14,8 @@
 #include "dep/imgui/backends/imgui_impl_opengl3.h"
 #include "dep/imgui/backends/imgui_impl_sdl.h"
 
-
+#include "stb.h"
+#include "Texture.hpp"
 
 #include <filesystem>
 #include "header/directorySnippet.hpp"
@@ -61,6 +62,7 @@ int	main(int argc, char* argv[]) {
 	auto shaderPath = appDir / "shader";
 	auto vShaderPath = shaderPath / "TranformVertexShader.vertexshader.txt";
 	auto fShaderPath = shaderPath / "SimpleFragmentShader.fragmentshader.txt";
+	auto fGShaderPath = shaderPath / "SimpleFragmentShader.fragmentshaderGif.txt";
 	auto vsShaderPath = shaderPath / "1.model_loading.vs";
 	auto fsShaderPath = shaderPath / "1.model_loading.fs";
 
@@ -69,9 +71,23 @@ int	main(int argc, char* argv[]) {
 	auto Objet3DPath_Frog = ObjetPath / "FrogUV.fbx";
 	auto Objet3DPath_Banana = ObjetPath / "Banana.obj";
 	auto Objet3DPath_Snake = ObjetPath / "Snake_angry.fbx";
+
+	auto Objet3DPath_Crab = ObjetPath / "crab.obj";
+	auto Objet3DPath_Deer = ObjetPath / "deer.obj";
+	auto Objet3DPath_Pub = ObjetPath / "panneauPUB.obj";
+
+	auto imagePath = appDir / "images";
+	auto image_PathGif = imagePath / "Mmmh_sun.gif";
+	auto image_Path = imagePath / "Crab_Texture.png";
+	auto image_PathDeer = imagePath / "Deer_Texture.png";
+
+	std::string path_stringImage{ image_Path.u8string() };
+	std::string path_stringImageDeer{ image_PathDeer.u8string() };
+	std::string path_stringGif{ image_PathGif.u8string() };
 	
 	std::string path_stringV{ vShaderPath.u8string() };
 	std::string path_stringF{ fShaderPath.u8string() };
+	std::string path_stringFG{ fGShaderPath.u8string() };
 	std::string path_stringVS{ vShaderPath.u8string() };
 	std::string path_stringFS{ fShaderPath.u8string() };
 
@@ -79,21 +95,45 @@ int	main(int argc, char* argv[]) {
 	std::string path_stringObjet_Frog{ Objet3DPath_Frog.u8string() };
 	std::string path_stringObjet_Banana{ Objet3DPath_Banana.u8string() };
 	std::string path_stringObjet_Snake{ Objet3DPath_Snake.u8string() };
+	std::string path_stringObjet_Crab{ Objet3DPath_Crab.u8string() };
+	std::string path_stringObjet_Deer{ Objet3DPath_Deer.u8string() };
+	std::string path_stringObjet_Pub{ Objet3DPath_Pub.u8string() };
 
-
-	//GLuint programID = LoadShaders("C:/Users/LenyN/Documents/GitHub/projet6/shader/TranformVertexShader.vertexshader.txt", "C:/Users/LenyN/Documents/GitHub/projet6/shader/SimpleFragmentShader.fragmentshader.txt");
 	GLuint programID = LoadShaders(path_stringV.c_str(), path_stringF.c_str());
+	//GLuint programIDGif = LoadShaders(path_stringV.c_str(), path_stringFG.c_str());
 
 	GLuint TextureID = glGetUniformLocation(programID, "myTextureSampler");
+
+	//GLuint TextureIDGif = glGetUniformLocation(programIDGif, "myTextureSampler");
+	//GLuint LayerIDGif = glGetUniformLocation(programIDGif, "layer");
+
+	//Texture t1;
+	//t1.LoadTextureGif(path_stringGif.c_str());
+	//glActiveTexture(GL_TEXTURE0);
+	//glBindTexture(GL_TEXTURE_2D_ARRAY, t1.texture);
+
+	Texture t2;
+	t2.LoadTexture2D(path_stringImage.c_str());
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, t2.texture);
+
+	Texture t3;
+	t2.LoadTexture2D(path_stringImageDeer.c_str());
+	glActiveTexture(GL_TEXTURE2);
+	glBindTexture(GL_TEXTURE_2D, t3.texture);
 
 	// Read our .obj file
 	std::vector<unsigned short> indices;
 	std::vector< glm::vec3 > vertices;
 	std::vector< glm::vec2 > uvs;
 	std::vector< glm::vec3 > normals; // Won't be used at the moment.
-	//bool res = loadAssImp("C:/Users/LenyN/Documents/GitHub/projet6/objets3D/shibaUV.fbx", indices, vertices, uvs, normals);
 	Model ourModel_Shiba(path_stringObjet_Shiba.c_str());
 	Model ourModel_Frog(path_stringObjet_Frog.c_str());
+	Model ourModel_Banana(path_stringObjet_Banana.c_str());
+	Model ourModel_Snake(path_stringObjet_Snake.c_str());
+	Model ourModel_Crab(path_stringObjet_Crab.c_str());
+	Model ourModel_Deer(path_stringObjet_Deer.c_str());
+	Model ourModel_Pub(path_stringObjet_Pub.c_str());
 
 
 	// build and compile shaders
@@ -169,24 +209,39 @@ int	main(int argc, char* argv[]) {
 			}
 		}
 	}
-	
+
+	const char* name = "Advert";
+		
 	// Create Table Mesh
 	for (int i = 0; i < ModelMatrix.size(); i++) 
 	{
+		
 		if (!ChangeMesh)
 		{
-			ModelMesh.push_back(&ourModel_Shiba);
+			ModelMesh.push_back(&ourModel_Crab);
 			ChangeMesh = true;
+			
+			
 		}
 		else if (ChangeMesh)
 		{
-			ModelMesh.push_back(&ourModel_Frog);
+			ModelMesh.push_back(&ourModel_Deer);
 			ChangeMesh = false;
+			
+			//for each (Mesh mesh in ModelMesh[i]->meshes)
+			//{
+			//	const char* name2 = mesh.matName.C_Str();
+			//	if (*name2 == *name) {
+			//		//glUseProgram(programIDGif);
+			//		//glUniform1i(TextureID, 0);
+			//	}
+			//}
 		}
 	}
 
 	//-----------------------------------------------------------------------------------------------------------------------//
-
+	int frame = 0;
+	bool test = false;
 	bool appRunning = true;
 	while (appRunning) {
 
@@ -270,6 +325,7 @@ int	main(int argc, char* argv[]) {
 
 			//glClear(GL_COLOR_BUFFER_BIT);
 			glUseProgram(programID);
+			
 
 			// Clear the screen
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -317,15 +373,13 @@ int	main(int argc, char* argv[]) {
 			ImGui::Begin("Mesh");
 
 			if (ImGui::Button("Change")) {
-				if (!ChangeMesh)
+				if (test)
 				{
-					//MeshModel = ourModel;
-					//ChangeMesh = true;
+
 				}
-				else if (ChangeMesh) 
+				else if (!test) 
 				{
-					//MeshModel = ourModel_Frog;
-					//ChangeMesh = false;
+
 				}
 
 			}
@@ -336,10 +390,6 @@ int	main(int argc, char* argv[]) {
 			ImGui::Begin("Modif Scene");
 
 			ImGui::LabelText("", "Object number : %i", ModelMatrix.size());
-
-			/*if (ImGui::Button("Click Button!")) {
-				printf("Button clicked ");
-			}*/
 
 			ImGui::SliderInt("Number object", &slidertest, 1, 64000);
 
@@ -404,53 +454,12 @@ int	main(int argc, char* argv[]) {
 
 			}
 
-
-
 			ImGui::End();
 
 			// Bind Buffer
 			Vbuffer->BindBuffer(0, 3);
 			Cbuffer->BindBuffer(1, 3);
 			UVbuffer->BindBuffer(1, 2);
-
-			/*glEnableVertexAttribArray(0);
-			glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
-			glVertexAttribPointer(
-				0,                  // attribute 0. No particular reason for 0, but must match the layout in the shader.
-				3,                  // size
-				GL_FLOAT,           // type
-				GL_FALSE,           // normalized?
-				0,                  // stride
-				(void*)0            // array buffer offset
-			);
-
-			// 2nd attribute buffer : colors
-			glEnableVertexAttribArray(1);
-			glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
-			glVertexAttribPointer(
-				1,                                // attribute. No particular reason for 1, but must match the layout in the shader.
-				3,                                // size
-				GL_FLOAT,                         // type
-				GL_FALSE,                         // normalized?
-				0,                                // stride
-				(void*)0                          // array buffer offset
-			);
-
-			// 3nd attribute buffer : UVs
-			glEnableVertexAttribArray(2);
-			glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
-			glVertexAttribPointer(
-				1,                                // attribute. No particular reason for 1, but must match the layout in the shader.
-				2,                                // size : U+V => 2
-				GL_FLOAT,                         // type
-				GL_FALSE,                         // normalized?
-				0,                                // stride
-				(void*)0                          // array buffer offset
-			);*/
-			
-			// Draw the triangle !
-			//glDrawArrays(GL_TRIANGLES, 0, indices.size()); // Starting from vertex 0; 3 vertices total -> 1 triangle
-			//glDisableVertexAttribArray(0);
 
 			//CAMERA
 			camera->UpdateCamera(win, curDirs, MousePosX, MousePosY, mouseClicRight);
@@ -470,23 +479,13 @@ int	main(int argc, char* argv[]) {
 				//MeshModel.Draw(ourShader);
 				ModelMesh[i]->Draw(ourShader);
 
+				glUniform1i(TextureID, 0);
+
 				// Index buffer
 				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementbuffer);
-
-				// Draw the triangles !
-				glDrawElements(
-					GL_TRIANGLES,      // mode
-					indices.size(),    // count
-					GL_UNSIGNED_SHORT,   // type
-					(void*)0           // element array buffer offset
-				);
 			}
-
-			// render the loaded model
-			//glm::mat4 model = glm::mat4(1.0f);
-			//model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f)); // translate it down so it's at the center of the scene
-			//model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));	// it's a bit too big for our scene, so scale it down
-						
+					
+			//Texture::GifTick(t1, LayerIDGif, &frame);
 
 			// Enable depth test
 			glEnable(GL_DEPTH_TEST);

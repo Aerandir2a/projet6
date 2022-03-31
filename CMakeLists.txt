@@ -9,6 +9,7 @@ shader/shader.hpp
 shader/loadShader.cpp
 shader/TranformVertexShader.vertexshader.txt
 shader/SimpleFragmentShader.fragmentshader.txt
+shader/SimpleFragmentShader.fragmentshaderGif.txt
 shader/1.model_loading.fs
 shader/1.model_loading.vs
 header/stb_image.h
