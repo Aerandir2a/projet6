@@ -1,12 +1,19 @@
 #pragma once 
 
 #include <chrono>
-#include<GL/glew.h>
+#include <GL/glew.h>
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
-#include<gl/GL.h>
+#include <gl/GL.h>
 #include <vector>;
 #include <SDL_opengl.h>
+
+inline void check_ogl_error() {
+#if _DEBUG
+    do { if (glGetError() != GL_NONE) __debugbreak(); } while (false);
+#endif
+}
+
 
 
 namespace GC_3D
@@ -32,13 +39,19 @@ namespace GC_3D
       Vector<vec3> m_Normals;
       Vector<vec2> m_TexCoord;
 
+      // Read our .obj file
+      Vector<unsigned short> indices;
+      Vector<vec3> vertices;
+      Vector<vec2> uvs;
+      Vector<vec3> normals; // Won't be used at the moment.
+
       Vector<uint32_t> m_Indices;
 
       void Bind() const;
       void Draw() const;
   };
 
-  void Geometry::Bind() const
+  /*void Geometry::Bind() const
   {
       // Set each attribute pointer, if we have data for it.
       if (!m_Pos.empty())
@@ -68,9 +81,9 @@ namespace GC_3D
       {
           glDisableClientState(GL_TEXTURE_COORD_ARRAY);
       }
-  }
+  }*/
 
-  void Geometry::Draw() const
+  /*void Geometry::Draw() const
   {
       if (!m_Indices.empty())
       {
@@ -80,5 +93,7 @@ namespace GC_3D
       {
           glDrawArrays(GL_TRIANGLES, 0, m_Pos.size());
       }
-  }
+  }*/
+
+
 }

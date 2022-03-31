@@ -5,16 +5,36 @@
 #endif
 #include"gc_3d_defs.hpp"
 #include"shader/shader.hpp"
+//#define STB_IMAGE_IMPLEMENTATION
+#include "header/stb_image.h"
+#include "header/buffer.hpp"
+#include "header/controls.hpp"
+#include "header/camera.hpp"
+#include "dep/imgui/imgui.h"
+#include "dep/imgui/backends/imgui_impl_opengl3.h"
+#include "dep/imgui/backends/imgui_impl_sdl.h"
+
+#include "stb.h"
+#include "Texture.hpp"
+
+#include <filesystem>
+#include "header/directorySnippet.hpp"
+#include "header/model.h"
+#include "header/shader_.h"
 
 
 using namespace GC_3D;
 
-int	main(int argc, char* argv[]){
+int	main(int argc, char* argv[]) {
 	SDL_Init(SDL_INIT_VIDEO);
 
 	uint32_t windowFlags = SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE;
 
-	SDL_Window* win = SDL_CreateWindow("moteur",SDL_WINDOWPOS_UNDEFINED,SDL_WINDOWPOS_UNDEFINED,1024,768,windowFlags);
+	SDL_Window* win = SDL_CreateWindow("moteur", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 1024, 768, windowFlags);
+
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_PROFILE_CORE);
 
 	SDL_GLContext context = SDL_GL_CreateContext(win);
 	SDL_GL_MakeCurrent(win, context);
@@ -23,306 +43,560 @@ int	main(int argc, char* argv[]){
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glewInit();
 
-	GLuint programID = LoadShaders(
-		"C:/Users/LenyN/Documents/GitHub/PROJET__6/shader/TranformVertexShader.vertexshader.txt",
-		"C:/Users/LenyN/Documents/GitHub/PROJET__6/shader/SimpleFragmentShader.fragmentshader.txt");
+	//init ImGUI
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+	ImGuiIO& io = ImGui::GetIO();
+	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;  // Enable Keyboard Controls
+	ImGui_ImplSDL2_InitForOpenGL(win, context);
+	ImGui_ImplOpenGL3_Init();
+	ImGui::StyleColorsDark();
+
+	//LINK----------------------------------------------------------------------------------------------------------------------//
+	std::filesystem::path appPath(GetAppPath());
+	auto appDir = appPath.parent_path();
+	auto shaderPath = appDir / "shader";
+	auto vShaderPath = shaderPath / "TranformVertexShader.vertexshader.txt";
+	auto fShaderPath = shaderPath / "SimpleFragmentShader.fragmentshader.txt";
+	auto fGShaderPath = shaderPath / "SimpleFragmentShader.fragmentshaderGif.txt";
+	auto vsShaderPath = shaderPath / "1.model_loading.vs";
+	auto fsShaderPath = shaderPath / "1.model_loading.fs";
+
+	auto ObjetPath = appDir / "objets3D";
+	auto Objet3DPath_Shiba = ObjetPath / "shibaTexture.fbx";
+	auto Objet3DPath_Frog = ObjetPath / "FrogUV.fbx";
+	auto Objet3DPath_Banana = ObjetPath / "Banana.obj";
+	auto Objet3DPath_Snake = ObjetPath / "Snake_angry.fbx";
+
+	auto Objet3DPath_Crab = ObjetPath / "crab.obj";
+	auto Objet3DPath_Deer = ObjetPath / "deer.obj";
+	auto Objet3DPath_Pub = ObjetPath / "plane.fbx";
+
+	auto imagePath = appDir / "images";
+	auto image_PathGif = imagePath / "smugDance.gif";
+	auto image_PathGif2 = imagePath / "UwU3.gif";
+	auto image_Path = imagePath / "TextureShiba.png";
+	auto image_PathCrab = imagePath / "Crab_Texture.png";
+
+	std::string path_stringImage{ image_Path.u8string() };
+	std::string path_stringImageCrab{ image_PathCrab.u8string() };
+	std::string path_stringGif{ image_PathGif.u8string() };
+	std::string path_stringGif2{ image_PathGif2.u8string() };
+
+	std::string path_stringV{ vShaderPath.u8string() };
+	std::string path_stringF{ fShaderPath.u8string() };
+	std::string path_stringFG{ fGShaderPath.u8string() };
+	std::string path_stringVS{ vShaderPath.u8string() };
+	std::string path_stringFS{ fShaderPath.u8string() };
+
+	std::string path_stringObjet_Shiba{ Objet3DPath_Shiba.u8string() };
+	std::string path_stringObjet_Frog{ Objet3DPath_Frog.u8string() };
+	std::string path_stringObjet_Banana{ Objet3DPath_Banana.u8string() };
+	std::string path_stringObjet_Snake{ Objet3DPath_Snake.u8string() };
+	std::string path_stringObjet_Crab{ Objet3DPath_Crab.u8string() };
+	std::string path_stringObjet_Deer{ Objet3DPath_Deer.u8string() };
+	std::string path_stringObjet_Pub{ Objet3DPath_Pub.u8string() };
+
+	GLuint programID = LoadShaders(path_stringV.c_str(), path_stringF.c_str());
+	GLuint programIDGif = LoadShaders(path_stringV.c_str(), path_stringFG.c_str());
+
+	GLuint TextureID = glGetUniformLocation(programID, "myTextureSampler");
+
+	GLuint TextureIDGif = glGetUniformLocation(programIDGif, "myTextureSampler");
+	GLuint LayerIDGif = glGetUniformLocation(programIDGif, "layer");
+
+	Texture t2;
+	t2.LoadTexture2D(path_stringImage.c_str());
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, t2.texture);
+
+	Texture t3;
+	t2.LoadTexture2D(path_stringImageCrab.c_str());
+	glActiveTexture(GL_TEXTURE2);
+	glBindTexture(GL_TEXTURE_2D, t3.texture);
+
+	Texture t1;
+	t1.LoadTextureGif(path_stringGif.c_str());
+	glActiveTexture(GL_TEXTURE3);
+	glBindTexture(GL_TEXTURE_2D_ARRAY, t1.texture);
+	
+	Texture t4;
+	t4.LoadTextureGif(path_stringGif2.c_str());
+	glActiveTexture(GL_TEXTURE4);
+	glBindTexture(GL_TEXTURE_2D_ARRAY, t4.texture);
+
 	
 
-	// Get a handle for our "MVP" uniform
-	// Only during the initialisation
-	GLuint MatrixID = glGetUniformLocation(programID, "MVP");
+	// Read our .obj file----------------------------------------------------------------------------------------------//
+	std::vector<unsigned short> indices;
+	std::vector< glm::vec3 > vertices;
+	std::vector< glm::vec2 > uvs;
+	std::vector< glm::vec3 > normals; // Won't be used at the moment.
+	Model ourModel_Shiba(path_stringObjet_Shiba.c_str());
+	Model ourModel_Frog(path_stringObjet_Frog.c_str());
+	Model ourModel_Banana(path_stringObjet_Banana.c_str());
+	Model ourModel_Snake(path_stringObjet_Snake.c_str());
+	Model ourModel_Crab(path_stringObjet_Crab.c_str());
+	Model ourModel_Deer(path_stringObjet_Deer.c_str());
+	Model ourModel_Pub(path_stringObjet_Pub.c_str());
+
+
+	// build and compile shaders
+	// -------------------------
+	Shader ourShader(path_stringVS.c_str(), path_stringFS.c_str());
+
+	// Generate a buffer for the indices
+	GLuint elementbuffer;
+	glGenBuffers(1, &elementbuffer);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementbuffer);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned short), indices.data(), GL_STATIC_DRAW);
 
 	GLuint VertexArrayID;
 	glGenVertexArrays(1, &VertexArrayID);
 	glBindVertexArray(VertexArrayID);
 
-	// Projection matrix : 45° Field of View, 4:3 ratio, display range : 0.1 unit <-> 100 units
-	mat4 Projection = perspective(radians(45.0f), 4.0f / 3.0f, 0.1f, 100.0f);
+	//BUFFER---------------------------------------------------------------------------------------------------------------------------//
+	// Init Buffer
+	Buffer* Vbuffer = new Buffer();
+	Buffer* Cbuffer = new Buffer();
+	Buffer* UVbuffer = new Buffer();
 
-	// Or, for an ortho camera :
-	//glm::mat4 Projection = glm::ortho(-10.0f,10.0f,-10.0f,10.0f,0.0f,100.0f); // In world coordinates
+	//Create Buffer
+	Vbuffer->CreateBuffer(vertices.data(), vertices.size() * sizeof(glm::vec3));
+	Cbuffer->CreateBuffer(vertices.data(), vertices.size() * sizeof(glm::vec3));
+	UVbuffer->CreateBuffer(uvs.data(), uvs.size() * sizeof(glm::vec2));
 
-	// Camera matrix
-	mat4 View = lookAt(
-		vec3(4, 3, 3), // Camera is at (4,3,3), in World Space
-		vec3(0, 0, 0), // and looks at the origin
-		vec3(0, 1, 0)  // Head is up (set to 0,-1,0 to look upside-down)
-	);
+	//VARIABLE------------------------------------------------------------------------------------------------------------------------//
+	//Interaction avec la souris
+	int MousePosX = 1024 / 2;
+	int MousePosY = 768 / 2;
+	bool focus = true;
+	bool mouseClicRight = false;
 
-	// Model matrix : an identity matrix (model will be at the origin)
-	mat4 Model = mat4(1.0f);
-	// Our ModelViewProjection : multiplication of our 3 matrices
-	mat4 MVP = Projection * View * Model; // Remember, matrix multiplication is the other way around
+	//Variable slider
+	int slidertest = 1;
+	float sliderColorR = 0.0;
+	float sliderColorG = 0.0;
+	float sliderColorB = 0.0;
 
-	static const GLfloat g_vertex_buffer_data[] = {
-			-1.0f,-1.0f,-1.0f, // triangle 1 : begin
-		-1.0f,-1.0f, 1.0f,
-		-1.0f, 1.0f, 1.0f, // triangle 1 : end
-		1.0f, 1.0f,-1.0f, // triangle 2 : begin
-		-1.0f,-1.0f,-1.0f,
-		-1.0f, 1.0f,-1.0f, // triangle 2 : end
-		1.0f,-1.0f, 1.0f,
-		-1.0f,-1.0f,-1.0f,
-		1.0f,-1.0f,-1.0f,
-		1.0f, 1.0f,-1.0f,
-		1.0f,-1.0f,-1.0f,
-		-1.0f,-1.0f,-1.0f,
-		-1.0f,-1.0f,-1.0f,
-		-1.0f, 1.0f, 1.0f,
-		-1.0f, 1.0f,-1.0f,
-		1.0f,-1.0f, 1.0f,
-		-1.0f,-1.0f, 1.0f,
-		-1.0f,-1.0f,-1.0f,
-		-1.0f, 1.0f, 1.0f,
-		-1.0f,-1.0f, 1.0f,
-		1.0f,-1.0f, 1.0f,
-		1.0f, 1.0f, 1.0f,
-		1.0f,-1.0f,-1.0f,
-		1.0f, 1.0f,-1.0f,
-		1.0f,-1.0f,-1.0f,
-		1.0f, 1.0f, 1.0f,
-		1.0f,-1.0f, 1.0f,
-		1.0f, 1.0f, 1.0f,
-		1.0f, 1.0f,-1.0f,
-		-1.0f, 1.0f,-1.0f,
-		1.0f, 1.0f, 1.0f,
-		-1.0f, 1.0f,-1.0f,
-		-1.0f, 1.0f, 1.0f,
-		1.0f, 1.0f, 1.0f,
-		-1.0f, 1.0f, 1.0f,
-		1.0f,-1.0f, 1.0f
-	};
+	// Variable pour changer de Mesh
+	bool ChangeMesh = false;
+	bool ChangeGif = false;
 
-	static const GLfloat g_color_buffer_data[] = {
-	0.583f,  0.771f,  0.014f,
-	0.609f,  0.115f,  0.436f,
-	0.327f,  0.483f,  0.844f,
-	0.822f,  0.569f,  0.201f,
-	0.435f,  0.602f,  0.223f,
-	0.310f,  0.747f,  0.185f,
-	0.597f,  0.770f,  0.761f,
-	0.559f,  0.436f,  0.730f,
-	0.359f,  0.583f,  0.152f,
-	0.483f,  0.596f,  0.789f,
-	0.559f,  0.861f,  0.639f,
-	0.195f,  0.548f,  0.859f,
-	0.014f,  0.184f,  0.576f,
-	0.771f,  0.328f,  0.970f,
-	0.406f,  0.615f,  0.116f,
-	0.676f,  0.977f,  0.133f,
-	0.971f,  0.572f,  0.833f,
-	0.140f,  0.616f,  0.489f,
-	0.997f,  0.513f,  0.064f,
-	0.945f,  0.719f,  0.592f,
-	0.543f,  0.021f,  0.978f,
-	0.279f,  0.317f,  0.505f,
-	0.167f,  0.620f,  0.077f,
-	0.347f,  0.857f,  0.137f,
-	0.055f,  0.953f,  0.042f,
-	0.714f,  0.505f,  0.345f,
-	0.783f,  0.290f,  0.734f,
-	0.722f,  0.645f,  0.174f,
-	0.302f,  0.455f,  0.848f,
-	0.225f,  0.587f,  0.040f,
-	0.517f,  0.713f,  0.338f,
-	0.053f,  0.959f,  0.120f,
-	0.393f,  0.621f,  0.362f,
-	0.673f,  0.211f,  0.457f,
-	0.820f,  0.883f,  0.371f,
-	0.982f,  0.099f,  0.879f
-	};
+	//Variable Texture
+	int frame = 0;
+	int frame2 = 0;
+	bool ChangeProgram = false;
 
-	GLuint vertexbuffer;
-	// Generate 1 buffer, put the resulting identifier in vertexbuffer
-	glGenBuffers(1, &vertexbuffer);
-	// The following commands will talk about our 'vertexbuffer' buffer
-	glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
-	// Give our vertices to OpenGL.
-	glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
+	//Variables pour calcule des ms/frame
+	int nbFrames = 0;
+	double msFrames = 0;
+	double FPS = 0;
+	auto lastTime = Clock::now();
+	auto time = Clock::now();
+	auto DebutFrame = Clock::now();
 
-	GLuint colorbuffer;
-	glGenBuffers(1, &colorbuffer);
-	glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(g_color_buffer_data), g_color_buffer_data, GL_STATIC_DRAW);
-
-	bool appRunning = true;
-	while (appRunning) {
-
-		SDL_Event curEvent;
-		while (SDL_PollEvent(&curEvent))
-		{
-			//SDL_Quit();
-		}
-
-		glClear(GL_COLOR_BUFFER_BIT);
-		glUseProgram(programID);	
-		
-		// Send our transformation to the currently bound shader, in the "MVP" uniform
-		// This is done in the main loop since each model will have a different MVP matrix (At least for the M part)
-		glUniformMatrix4fv(MatrixID, 1, GL_FALSE, value_ptr(MVP));
-
-		glEnableVertexAttribArray(0);
-		glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
-		glVertexAttribPointer(
-			0,                  // attribute 0. No particular reason for 0, but must match the layout in the shader.
-			3,                  // size
-			GL_FLOAT,           // type
-			GL_FALSE,           // normalized?
-			0,                  // stride
-			(void*)0            // array buffer offset
-		);
-
-		// 2nd attribute buffer : colors
-		glEnableVertexAttribArray(1);
-		glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
-		glVertexAttribPointer(
-			1,                                // attribute. No particular reason for 1, but must match the layout in the shader.
-			3,                                // size
-			GL_FLOAT,                         // type
-			GL_FALSE,                         // normalized?
-			0,                                // stride
-			(void*)0                          // array buffer offset
-		);
-		// Draw the triangle !
-		glDrawArrays(GL_TRIANGLES, 0, 12*3); // Starting from vertex 0; 3 vertices total -> 1 triangle
-		glDisableVertexAttribArray(0);	
-
-
-		SDL_GL_SwapWindow(win);
+	if (win != nullptr) {
+		SDL_WarpMouseInWindow(win, 1024 / 2, 768 / 2);
 	}
 
+	Camera* camera = new Camera();
+	camera->CreateCamera();
+
+	//TABLE---------------------------------------------------------------------------------------------------------------------------//
+
+	// Tableau de position des objets
+	std::vector<mat4> ModelMatrix;
+	//Tableau de Model
+	std::vector<Model*> ModelMesh;
+	std::vector<Model*> ModelMeshGif;
+	int IndexTexture[2] = {0, 1};
+
+	// Create number objects in box (64 000 objects 40x40x40)
+	int nMax = 40;
+	float scale = 5.0f; // Distance entre les objets
+	for (int i = 0; i < nMax; i++) { // Axe X
+		for (int j = 0; j < nMax; j++) { // Axe Y
+			for (int k = 0; k < nMax; k++) { // Axe Z
+				glm::vec3 pos =
+					i * scale * vec3(1.0f, 0.0f, 0.0f) +
+					j * scale * vec3(0.0f, 1.0f, 0.0f) +
+					k * scale * vec3(0.0f, 0.0f, -1.0f);
+				ModelMatrix.push_back(glm::translate(mat4(1.0f), pos));
+			}
+		}
+	}
+
+	const char* name = "Advert";
+		
+	// Create Table Mesh
+	for (int i = 0; i < ModelMatrix.size(); i++) 
+	{
+		
+		if (!ChangeMesh)
+		{
+			ModelMesh.push_back(&ourModel_Shiba);
+			ChangeMesh = true;
+			
+		}
+		else if (ChangeMesh)
+		{
+			ModelMesh.push_back(&ourModel_Crab);
+			ChangeMesh = false;
+			
+		}
+	}
+
+	//Create Cube Mesh for GIF
+	for (int i = 0; i < ModelMatrix.size(); i++)
+	{
+		ModelMeshGif.push_back(&ourModel_Pub);
+	}
+
+	//-----------------------------------------------------------------------------------------------------------------------//
+	
+
+	/////////////////////////////////////////////////////////////////////////////////////////// WHILE ////////////////////////////////////////////////////////////////////////////////////////////
+	
+	bool appRunning = true;
+	glUseProgram(programID);
+	while (appRunning) {
+
+		Dirs curDirs;
+		SDL_Event curEvent;
+		// Input-------------------------------------------------------------------------------------------------------------//
+		while (SDL_PollEvent(&curEvent))
+		{
+			if (curEvent.type == SDL_QUIT) {
+				return 0;
+			}
+
+			if (curEvent.type == SDL_WINDOWEVENT)
+			{
+				if (curEvent.window.event == SDL_WINDOWEVENT_FOCUS_GAINED)
+				{
+					focus = true;
+				}
+				if (curEvent.window.event == SDL_WINDOWEVENT_FOCUS_LOST)
+				{
+					focus = false;
+				}
+			}
+
+			if (curEvent.type == SDL_MOUSEMOTION) {
+				if (mouseClicRight) {
+					SDL_GetMouseState(&MousePosX, &MousePosY);
+				}
+			}
+
+			if (curEvent.type == SDL_MOUSEBUTTONDOWN) {
+				if (curEvent.button.button == SDL_BUTTON_RIGHT) {
+					SDL_WarpMouseInWindow(win, 1024 / 2, 768 / 2);
+					mouseClicRight = true;
+				}
+			}
+			if (curEvent.type == SDL_MOUSEBUTTONUP) {
+				if (curEvent.button.button == SDL_BUTTON_RIGHT) {
+					mouseClicRight = false;
+				}
+			}
+			if (curEvent.type == SDL_MOUSEWHEEL) {
+				if (curEvent.wheel.preciseY > 0) {
+					curDirs.front = 1;
+				}
+				if (curEvent.wheel.preciseY < 0) {
+					curDirs.back = 1;
+				}
+			}
+			if (curEvent.type == SDL_KEYDOWN)
+			{
+				if (curEvent.key.keysym.sym == SDLK_SPACE) {
+					SDL_WarpMouseInWindow(win, 1024 / 2, 768 / 2);
+				}
+				if (curEvent.key.keysym.sym == SDLK_d) {
+					curDirs.right = 1;
+				}
+				if (curEvent.key.keysym.sym == SDLK_q) {
+					curDirs.left = 1;
+				}
+				if (curEvent.key.keysym.sym == SDLK_z) {
+					curDirs.up = 1;
+				}
+				if (curEvent.key.keysym.sym == SDLK_s) {
+					curDirs.down = 1;
+				}
+			}
+			
+			ImGui_ImplSDL2_ProcessEvent(&curEvent);
+			if (!io.WantCaptureMouse)
+			{
+				//use mouse events not already used by ImGui
+			}
+			if (!io.WantCaptureKeyboard)
+			{
+				//use keyboard events not already used by ImGui
+			}
+		}	
+		//End Input--------------------------------------------------------------------------------------------------------//
+
+			// Clear the screen
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+			//Clock
+			auto curTime = Clock::now();
+			std::chrono::duration<float> elapsedSeconds = curTime - time;
+
+		//Calcul Perfs--------------------------------------------------------------------------------------------------//
+			
+			//ms lisser
+			Duration deltaTime = curTime - lastTime;
+			nbFrames++;
+
+			//FPS
+			auto FinFrame = Clock::now();
+			Duration FPSTime = FinFrame - DebutFrame;
+			//FPS = 1.0f / GC_3D::Seconds(FPSTime);
+			DebutFrame = FinFrame;
+
+		//Imgui----------------------------------------------------------------------------------------------------------//
+			//Render Loop
+			ImGui_ImplOpenGL3_NewFrame();
+			ImGui_ImplSDL2_NewFrame(win);
+
+			ImGui::NewFrame();
+
+			//Calcule ms/frame
+			float const curSamplingTime = GC_3D::Seconds(deltaTime);
+			if (curSamplingTime >= 1.0)
+			{
+				msFrames = curSamplingTime * 1000.0 / double(nbFrames);
+				nbFrames = 0;
+				lastTime = Clock::now();
+				FPS = 1.0f / GC_3D::Seconds(FPSTime);
+			}
+
+			//Window Perfs
+			ImGui::Begin("Perfs");
+
+			ImGui::LabelText("", "Time (s) : %f", elapsedSeconds * 1e-0);
+			ImGui::LabelText("", "ms/frame : %f", msFrames);
+			ImGui::LabelText("", "FPS : %f", FPS);
+
+			ImGui::End();
+			//End Window Perfs
+			
+			//Window Mesh
+			ImGui::Begin("Mesh");
+
+			if (ImGui::Button("Change Mesh")) {
+				if (ChangeProgram)
+				{
+					glUseProgram(programID);
+					ChangeProgram = !ChangeProgram;
+				}
+				else if (!ChangeProgram) 
+				{
+					glUseProgram(programIDGif);
+					ChangeProgram = !ChangeProgram;
+				}
+
+				if (ChangeGif)
+				{
+					ChangeGif = !ChangeGif;
+				}
+				else if (!ChangeGif)
+				{
+					ChangeGif = !ChangeGif;
+				}
+
+			}
+
+			ImGui::End();
+			//End Window Mesh
+
+			//Window Modif
+			ImGui::Begin("Modif Scene");
+
+			ImGui::LabelText("", "Object number : %i", ModelMatrix.size());
+
+			ImGui::SliderInt("Number object", &slidertest, 1, 64000);
+
+			if (ImGui::Button("+ 1")) {
+				slidertest++;
+				printf("Objet + 1 ");
+			}
+
+			ImGui::SameLine();
+
+			if (ImGui::Button("- 1")) {
+				if (slidertest > 1)
+				{
+					slidertest--;
+					printf("Objet - 1 ");
+				}
+
+			}
+
+			if (ImGui::Button("+ 10")) {
+				slidertest = slidertest + 10;
+			}
+
+			ImGui::SameLine();
+
+			if (ImGui::Button("- 10")) {
+				if (slidertest > 10)
+				{
+					slidertest = slidertest - 10;
+				}
+
+			}
+
+
+			if (ImGui::Button("+ 100")) {
+				slidertest = slidertest + 100;
+			}
+
+			ImGui::SameLine();
+
+			if (ImGui::Button("- 100")) {
+				if (slidertest > 100)
+				{
+					slidertest = slidertest - 100;
+				}
+
+			}
+
+			if (ImGui::Button("+ 1000")) {
+				slidertest = slidertest + 1000;
+			}
+
+			ImGui::SameLine();
+
+			if (ImGui::Button("- 1000")) {
+				if (slidertest > 1000)
+				{
+					slidertest = slidertest - 1000;
+				}
+
+			}
+
+			ImGui::End();
+			//End Window Modif
+
+			//Window Color
+			ImGui::Begin("Background color");
+
+			ImGui::SliderFloat("Color Red", &sliderColorR, 0.0f, 1.0f);
+			ImGui::SliderFloat("Color Green", &sliderColorG, 0.0f, 1.0f);
+			ImGui::SliderFloat("Color Blue", &sliderColorB, 0.0f, 1.0f);
+
+			glClearColor(sliderColorR, sliderColorG, sliderColorB, 0.0);
+
+			ImGui::End();
+			//End Window Color
+
+			//BUFFER------------------------------------------------------------------------------------------------------//
+			
+			//Bind Buffer
+			Vbuffer->BindBuffer(0, 3);
+			Cbuffer->BindBuffer(1, 3);
+			UVbuffer->BindBuffer(1, 2);
+
+			//CAMERA-------------------------------------------------------------------------------------------------------//
+			// 
+			//Update camera
+			camera->UpdateCamera(win, curDirs, MousePosX, MousePosY, mouseClicRight);
+
+			// Matrix mvp
+			glm::mat4 mvp;
+			
+			// Afficher le nombre d'objet correspondant à la taille du tableau ModelMatrix
+			GLuint MatrixID;
+
+			if (ChangeProgram) {
+				MatrixID = glGetUniformLocation(programIDGif, "MVP");
+			}
+			else if (!ChangeProgram) {
+				MatrixID = glGetUniformLocation(programID, "MVP");
+			}
+
+			//Dessiner le nombre d'objets correspondant à la valeur du Slider
+			for (int i = 0; i < slidertest; i++) {
+
+				mvp = camera->ProjectionMatrix * camera->ViewMatrix * ModelMatrix[i];
+				
+				glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &mvp[0][0]);
+			
+				if (ChangeProgram) {
+					glUniform1i(TextureIDGif, 2 + i % 2);
+				}
+				else if (!ChangeProgram) {
+					glUniform1i(TextureID, i % 2);
+				}
+
+				ourShader.setMat4("model", ModelMatrix[i]);
+
+				if (!ChangeGif)
+				{
+					ModelMesh[i]->Draw(ourShader);
+				}
+				else if (ChangeGif)
+				{
+					ModelMeshGif[i]->Draw(ourShader);
+				}
+
+				// Index buffer
+				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementbuffer);
+			}
+				
+			//Refresh Gif
+			if (ChangeProgram) {
+				Texture::GifTick(t1, LayerIDGif, &frame);
+				Texture::GifTick(t4, LayerIDGif, &frame2);
+			}
+
+			//BackGround Color-----------------------------------------------------------------------------------------------------//
+			for (int i = 0; i < sliderColorR; i++) {
+
+				mvp = camera->ProjectionMatrix * camera->ViewMatrix * ModelMatrix[i];
+				GLuint MatrixID = glGetUniformLocation(programID, "MVP");
+				glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &mvp[0][0]);
+
+
+			}
+
+			for (int i = 0; i < sliderColorG; i++) {
+
+				mvp = camera->ProjectionMatrix * camera->ViewMatrix * ModelMatrix[i];
+				GLuint MatrixID = glGetUniformLocation(programID, "MVP");
+				glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &mvp[0][0]);
+
+
+			}
+
+			for (int i = 0; i < sliderColorB; i++) {
+
+				mvp = camera->ProjectionMatrix * camera->ViewMatrix * ModelMatrix[i];
+				GLuint MatrixID = glGetUniformLocation(programID, "MVP");
+				glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &mvp[0][0]);
+
+
+			}
+
+			// Enable depth test
+			glEnable(GL_DEPTH_TEST);
+			// Accept fragment if it closer to the camera than the former one
+			glDepthFunc(GL_LESS);
+
+			//Render ImGui
+			ImGui::Render();
+			ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+			//Swap window as usual
+			SDL_GL_SwapWindow(win);
+	}
+	
+	/////////////////////////////////////////////////////////////////////////////////////// END WHILE ///////////////////////////////////////////////////////////////////////////////////////////
+
 	return 0;
-}
-
-void old() {
-	auto time = Clock::now(); // à mettre avant le double while
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glEnable(GL_DEPTH_TEST);
-	glDepthMask(GL_TRUE);
-	glEnable(GL_LIGHTING);
-	glEnable(GL_LIGHT0);
-	GLfloat ambientLightFull[] = { 1.0f, 0.25f, 0.20f, 0.0f };
-	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, ambientLightFull);
-	float gray[] = { 0.75f, 0.75f, 0.75f, 1.0f };
-	glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, gray);
-
-	const float radius = 0.5;
-
-	auto curTime = Clock::now();
-	std::chrono::duration<float> fTime = curTime - time;
-	float camX = sin(fTime.count()) * radius;
-	float camZ = cos(fTime.count()) * radius;
-
-	vec3 cameraTarget = vec3(0.0, 0.0, -2.0);
-
-	vec3 cameraPos = cameraTarget - 4.0f * vec3(camX, -0.5, camZ);
-
-	// Creation de la camera
-	mat4 view;
-	view = lookAt(cameraPos, //Position de la camera
-		cameraTarget, //Cible à regarder
-		vec3(0.0, 1.0, 0.0)); //position vertical
-	mat4 camFrustum = frustum(-1.0, 1.0, -1.0, 1.0, 1.0, 1000.0);
-
-	glMatrixMode(GL_PROJECTION);
-	glLoadMatrixf(&camFrustum[0][0]);
-
-	glMatrixMode(GL_MODELVIEW);
-	glLoadMatrixf(&view[0][0]);
-
-	glTranslatef(0.0, 0.0, -2.0);
-
-	vec3 p0 = vec3(-1.0, -1.0, 1.0);
-	vec3 p1 = vec3(-1.0, 1.0, 1.0);
-	vec3 p2 = vec3(1.0, 1.0, 1.0);
-	vec3 p3 = vec3(1.0, -1.0, 1.0);
-	vec3 p4 = vec3(-1.0, -1.0, -1.0);
-	vec3 p5 = vec3(-1.0, 1.0, -1.0);
-	vec3 p6 = vec3(1.0, 1.0, -1.0);
-	vec3 p7 = vec3(1.0, -1.0, -1.0);
-
-	Geometry test;
-
-
-	test.m_Pos = {
-		p0,p1,p2,p3,
-		p0,p1,p4,p5,
-		p4,p5,p6,p7,
-		p7,p6,p2,p3,
-		p0,p3,p4,p7,
-		p1,p2,p5,p6
-	};
-
-	test.m_Normals = {
-		vec3(0.0,0.0,1.0),vec3(0.0,0.0,1.0),vec3(0.0,0.0,1.0),vec3(0.0,0.0,1.0),
-		vec3(-1.0,0.0,0.0),vec3(-1.0,0.0,0.0),vec3(-1.0,0.0,0.0),vec3(-1.0,0.0,0.0),
-		vec3(0.0,0.0,-1.0),vec3(0.0,0.0,-1.0),vec3(0.0,0.0,-1.0),vec3(0.0,0.0,-1.0),
-		vec3(1.0,0.0,0.0),vec3(1.0,0.0,0.0),vec3(1.0,0.0,0.0),vec3(1.0,0.0,0.0),
-		vec3(0.0,-1.0,0.0),vec3(0.0,-1.0,0.0),vec3(0.0,-1.0,0.0),vec3(0.0,-1.0,0.0),
-		vec3(0.0,1.0,0.0),vec3(0.0,1.0,0.0),vec3(0.0,1.0,0.0),vec3(0.0,1.0,0.0),
-	};
-
-	test.m_Indices = {
-		0,1,2,0,2,3,
-		4,5,6,5,6,7,
-		8,9,10,8,10,11,
-		12,13,14,12,14,15,
-		16,17,18,16,18,19,
-		20,21,22,21,22,23
-	};
-
-	test.Bind();
-	test.Draw();
-
-	/*glBegin(GL_TRIANGLES);
-	//Front
-	glColor4f(0.0, 1.0, 0.0, 1.0);
-	glVertex3f(-1.0f, -1.0f, 1.0f);
-	glVertex3f(1.0f, -1.0f, 1.0f);
-	glVertex3f(1.0f, 1.0f, 1.0f);
-	glVertex3f(-1.0f, -1.0f, 1.0f);
-	glVertex3f(-1.0f, 1.0f, 1.0f);
-	glVertex3f(1.0f, 1.0f, 1.0f);
-	//left
-	glColor4f(0.0, 0.0, 1.0, 1.0);
-	glVertex3f(-1.0f, -1.0f, 1.0f);
-	glVertex3f(-1.0f, -1.0f, -1.0f);
-	glVertex3f(-1.0f, 1.0f, 1.0f);
-	glVertex3f(-1.0f, 1.0f, 1.0f);
-	glVertex3f(-1.0f, 1.0f, -1.0f);
-	glVertex3f(-1.0f, -1.0f, -1.0f);
-	//right
-	glColor4f(0.0, 1.0, 1.0, 1.0);
-	glVertex3f(1.0f, -1.0f, 1.0f);
-	glVertex3f(1.0f, -1.0f, -1.0f);
-	glVertex3f(1.0f, 1.0f, 1.0f);
-	glVertex3f(1.0f, 1.0f, 1.0f);
-	glVertex3f(1.0f, 1.0f, -1.0f);
-	glVertex3f(1.0f, -1.0f, -1.0f);
-	//back
-	glColor4f(1.0, 0.0, 0.0, -1.0);
-	glVertex3f(-1.0f, -1.0f, -1.0f);
-	glVertex3f(1.0f, -1.0f, -1.0f);
-	glVertex3f(1.0f, 1.0f, -1.0f);
-	glVertex3f(-1.0f, -1.0f, -1.0f);
-	glVertex3f(-1.0f, 1.0f, -1.0f);
-	glVertex3f(1.0f, 1.0f, -1.0f);
-	//top
-	glColor4f(1.0, 0.0, 1.0, -1.0);
-	glVertex3f(-1.0f, 1.0f, 1.0f);
-	glVertex3f(-1.0f, 1.0f, -1.0f);
-	glVertex3f(1.0f, 1.0f, 1.0f);
-	glVertex3f(1.0f, 1.0f, 1.0f);
-	glVertex3f(1.0f, 1.0f, -1.0f);
-	glVertex3f(-1.0f, 1.0f, -1.0f);
-	//bot
-	glColor4f(1.0, 1.0, 0.0, -1.0);
-	glVertex3f(-1.0f, -1.0f, 1.0f);
-	glVertex3f(-1.0f, -1.0f, -1.0f);
-	glVertex3f(1.0f, -1.0f, 1.0f);
-	glVertex3f(1.0f, -1.0f, 1.0f);
-	glVertex3f(1.0f, -1.0f, -1.0f);
-	glVertex3f(-1.0f, -1.0f, -1.0f);
-
-	glEnd();*/
 }
