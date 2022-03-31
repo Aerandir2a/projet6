@@ -172,6 +172,7 @@ int	main(int argc, char* argv[]) {
 
 	// Variable pour changer de Mesh
 	bool ChangeMesh = false;
+	bool ChangeGif = false;
 
 	//Variables pour calcule des ms/frame
 	int nbFrames = 0;
@@ -194,6 +195,8 @@ int	main(int argc, char* argv[]) {
 	std::vector<mat4> ModelMatrix;
 	//Tableau de Model
 	std::vector<Model*> ModelMesh;
+	std::vector<Model*> ModelMeshGif;
+
 	int IndexTexture[2] = {0, 1};
 
 	// Create number objects in box (64 000 objects 40x40x40)
@@ -238,6 +241,12 @@ int	main(int argc, char* argv[]) {
 			//	}
 			//}
 		}
+	}
+
+	//Create Cube Mesh for GIF
+	for (int i = 0; i < ModelMatrix.size(); i++)
+	{
+			ModelMeshGif.push_back(&ourModel_Pub);
 	}
 
 	//-----------------------------------------------------------------------------------------------------------------------//
@@ -374,13 +383,13 @@ int	main(int argc, char* argv[]) {
 			ImGui::Begin("Mesh");
 
 			if (ImGui::Button("Change")) {
-				if (test)
+				if (ChangeGif)
 				{
-
+					ChangeGif = !ChangeGif;
 				}
-				else if (!test) 
+				else if (!ChangeGif)
 				{
-
+					ChangeGif = !ChangeGif;
 				}
 
 			}
@@ -479,10 +488,16 @@ int	main(int argc, char* argv[]) {
 				glUniform1i(TextureID, i % 2);
 
 				ourShader.setMat4("model", ModelMatrix[i]);
-				ModelMesh[i]->Draw(ourShader);
 
+				if (!ChangeGif)
+				{
+					ModelMesh[i]->Draw(ourShader);
+				}
+				else if (ChangeGif)
+				{
+					ModelMeshGif[i]->Draw(ourShader);
+				}
 				
-
 				// Index buffer
 				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementbuffer);
 			}
