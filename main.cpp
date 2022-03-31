@@ -6,6 +6,7 @@
 #include"gc_3d_defs.hpp"
 #include"shader/shader.hpp"
 //#define STB_IMAGE_IMPLEMENTATION
+#include "header/stb_image.h"
 #include "header/buffer.hpp"
 #include "header/controls.hpp"
 #include "header/camera.hpp"
@@ -13,13 +14,15 @@
 #include "dep/imgui/backends/imgui_impl_opengl3.h"
 #include "dep/imgui/backends/imgui_impl_sdl.h"
 
-#include "stb.h"
-#include "Texture.hpp"
+
 
 #include <filesystem>
 #include "header/directorySnippet.hpp"
 #include "header/model.h"
 #include "header/shader_.h"
+
+
+
 
 
 using namespace GC_3D;
@@ -62,89 +65,26 @@ int	main(int argc, char* argv[]) {
 	auto fsShaderPath = shaderPath / "1.model_loading.fs";
 
 	auto ObjetPath = appDir / "objets3D";
-	auto Objet3DPath = ObjetPath / "crab.obj";
-	auto Objet3DPath_Frog = ObjetPath / "panneauPUB.obj";
+	auto Objet3DPath_Shiba = ObjetPath / "shibaUV.fbx";
+	auto Objet3DPath_Frog = ObjetPath / "FrogUV.fbx";
+	auto Objet3DPath_Banana = ObjetPath / "Banana.obj";
+	auto Objet3DPath_Snake = ObjetPath / "Snake_angry.fbx";
 	
-	auto imagePath = appDir / "images";
-	auto image_PathGif = imagePath / "Mmmh_sun.gif";
-	auto image_Path = imagePath / "Crab_Texture.png";
-
-	std::string path_stringImage{ image_Path.u8string() };
-	std::string path_stringGif{ image_PathGif.u8string() };
 	std::string path_stringV{ vShaderPath.u8string() };
 	std::string path_stringF{ fShaderPath.u8string() };
 	std::string path_stringVS{ vShaderPath.u8string() };
 	std::string path_stringFS{ fShaderPath.u8string() };
 
-	std::string path_stringObjet{ Objet3DPath.u8string() };
+	std::string path_stringObjet_Shiba{ Objet3DPath_Shiba.u8string() };
 	std::string path_stringObjet_Frog{ Objet3DPath_Frog.u8string() };
+	std::string path_stringObjet_Banana{ Objet3DPath_Banana.u8string() };
+	std::string path_stringObjet_Snake{ Objet3DPath_Snake.u8string() };
 
 
 	//GLuint programID = LoadShaders("C:/Users/LenyN/Documents/GitHub/projet6/shader/TranformVertexShader.vertexshader.txt", "C:/Users/LenyN/Documents/GitHub/projet6/shader/SimpleFragmentShader.fragmentshader.txt");
 	GLuint programID = LoadShaders(path_stringV.c_str(), path_stringF.c_str());
 
 	GLuint TextureID = glGetUniformLocation(programID, "myTextureSampler");
-	GLuint LayerID = glGetUniformLocation(programID, "layer");
-
-	Texture t1;
-	t1.LoadTextureGif(path_stringGif.c_str());
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D_ARRAY, t1.texture);
-
-	Texture t2;
-	t2.LoadTexture2D(path_stringImage.c_str());
-	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, t2.texture);
-
-	//permet d'afficher la face avant mais pas la face derrière
-	//glEnable(GL_CULL_FACE);
-	//glCullFace(GL_FRONT);
-
-	// Get a handle for our "MVP" uniform
-	// Only during the initialisation
-	//GLuint MatrixID = glGetUniformLocation(programID, "MVP");
-
-	
-
-
-	/*
-
-	GLuint Texture;
-	glGenTextures(1, &Texture);
-	glBindTexture(GL_TEXTURE_2D, Texture);
-	// set the texture wrapping/filtering options (on the currently bound texture object)
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	// load and generate the texture
-	int width, height, nrChannels;
-	unsigned char* data = stbi_load("C:/Users/LenyN/Documents/GitHub/projet6/images/portal.png", &width, &height, &nrChannels, 0);
-
-	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-
-
-	if (data)
-	{
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-		glGenerateMipmap(GL_TEXTURE_2D);
-	}
-	else
-	{
-		std::cout << "Failed to load texture" << std::endl;
-	}
-	*/
-
-	// fill "indices" as needed
-
-	/*
-	// Read our .obj file
-	std::vector<unsigned short> indices;
-	std::vector< glm::vec3 > vertices;
-	std::vector< glm::vec2 > uvs;
-	std::vector< glm::vec3 > normals; // Won't be used at the moment.
-	bool res = loadAssImp("C:/Users/LenyN/Documents/GitHub/projet6/objets3D/FrogUV.fbx", indices, vertices, uvs, normals);
-	*/
 
 	// Read our .obj file
 	std::vector<unsigned short> indices;
@@ -152,7 +92,7 @@ int	main(int argc, char* argv[]) {
 	std::vector< glm::vec2 > uvs;
 	std::vector< glm::vec3 > normals; // Won't be used at the moment.
 	//bool res = loadAssImp("C:/Users/LenyN/Documents/GitHub/projet6/objets3D/shibaUV.fbx", indices, vertices, uvs, normals);
-	Model ourModel(path_stringObjet.c_str());
+	Model ourModel_Shiba(path_stringObjet_Shiba.c_str());
 	Model ourModel_Frog(path_stringObjet_Frog.c_str());
 
 
@@ -170,18 +110,18 @@ int	main(int argc, char* argv[]) {
 	glGenVertexArrays(1, &VertexArrayID);
 	glBindVertexArray(VertexArrayID);
 
-	// Buffer + CreateBuffer
+	//BUFFER---------------------------------------------------------------------------------------------------------------------------//
+	// Init Buffer
 	Buffer* Vbuffer = new Buffer();
 	Buffer* Cbuffer = new Buffer();
 	Buffer* UVbuffer = new Buffer();
 
+	//Create Buffer
 	Vbuffer->CreateBuffer(vertices.data(), vertices.size() * sizeof(glm::vec3));
 	Cbuffer->CreateBuffer(vertices.data(), vertices.size() * sizeof(glm::vec3));
 	UVbuffer->CreateBuffer(uvs.data(), uvs.size() * sizeof(glm::vec2));
 
-	// Tableau de position des objets
-	std::vector<mat4> ModelMatrix;
-
+	//VARIABLE------------------------------------------------------------------------------------------------------------------------//
 	//Interaction avec la souris
 	int MousePosX = 1024/2;
 	int MousePosY = 768/2;
@@ -189,6 +129,9 @@ int	main(int argc, char* argv[]) {
 	bool mouseClicRight = false;
 
 	int slidertest = 1;
+
+	// Variable pour changer de Mesh
+	bool ChangeMesh = false;
 
 	//Variables pour calcule des ms/frame
 	int nbFrames = 0;
@@ -205,7 +148,14 @@ int	main(int argc, char* argv[]) {
 	Camera* camera = new Camera();
 	camera->CreateCamera();
 
-	//Init tableau d'Objet (64 000 objets soit 40x40x40)
+	//TABLE---------------------------------------------------------------------------------------------------------------------------//
+	
+	// Tableau de position des objets
+	std::vector<mat4> ModelMatrix;
+	//Tableau de Model
+	std::vector<Model*> ModelMesh;
+
+	// Create number objects in box (64 000 objects 40x40x40)
 	int nMax = 40;
 	float scale = 5.0f; // Distance entre les objets
 	for (int i = 0; i < nMax; i++) { // Axe X
@@ -219,31 +169,24 @@ int	main(int argc, char* argv[]) {
 			}
 		}
 	}
-
-	// Mesh
-	bool ChangeMesh = false;
-
-	//Tableau de Model
-	std::vector<Model*> ModelMesh;
+	
+	// Create Table Mesh
 	for (int i = 0; i < ModelMatrix.size(); i++) 
 	{
 		if (!ChangeMesh)
 		{
-			ModelMesh.push_back(&ourModel);
+			ModelMesh.push_back(&ourModel_Shiba);
 			ChangeMesh = true;
 		}
 		else if (ChangeMesh)
 		{
 			ModelMesh.push_back(&ourModel_Frog);
 			ChangeMesh = false;
-			for each (Mesh mesh in ModelMesh[i]->meshes)
-			{
-				printf(const char(mesh.matName));
-			}
 		}
 	}
 
-	int frame = 0;
+	//-----------------------------------------------------------------------------------------------------------------------//
+
 	bool appRunning = true;
 	while (appRunning) {
 
@@ -528,15 +471,15 @@ int	main(int argc, char* argv[]) {
 				ModelMesh[i]->Draw(ourShader);
 
 				// Index buffer
-				//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementbuffer);
-				//
-				//// Draw the triangles !
-				//glDrawElements(
-				//	GL_TRIANGLES,      // mode
-				//	indices.size(),    // count
-				//	GL_UNSIGNED_SHORT,   // type
-				//	(void*)0           // element array buffer offset
-				//);
+				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementbuffer);
+
+				// Draw the triangles !
+				glDrawElements(
+					GL_TRIANGLES,      // mode
+					indices.size(),    // count
+					GL_UNSIGNED_SHORT,   // type
+					(void*)0           // element array buffer offset
+				);
 			}
 
 			// render the loaded model
@@ -544,7 +487,6 @@ int	main(int argc, char* argv[]) {
 			//model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f)); // translate it down so it's at the center of the scene
 			//model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));	// it's a bit too big for our scene, so scale it down
 						
-			Texture::GifTick(t1, LayerID, &frame);
 
 			// Enable depth test
 			glEnable(GL_DEPTH_TEST);
