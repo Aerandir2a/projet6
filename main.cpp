@@ -17,7 +17,6 @@
 
 #include <filesystem>
 #include "header/directorySnippet.hpp"
-#include "shader/ModelShader.h"
 #include "header/model.h"
 #include "header/shader_.h"
 

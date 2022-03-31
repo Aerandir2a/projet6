@@ -12,7 +12,6 @@ shader/SimpleFragmentShader.fragmentshader.txt
 shader/1.model_loading.fs
 shader/1.model_loading.vs
 header/stb_image.h
-shader/ModelShader.h
 glad/glad.h
 src/directorySnippet.cpp
 header/buffer.hpp
