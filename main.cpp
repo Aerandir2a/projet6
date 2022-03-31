@@ -23,9 +23,6 @@
 #include "header/shader_.h"
 
 
-
-
-
 using namespace GC_3D;
 
 int	main(int argc, char* argv[]) {
@@ -46,8 +43,6 @@ int	main(int argc, char* argv[]) {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glewInit();
 
-
-
 	//init ImGUI
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
@@ -57,6 +52,7 @@ int	main(int argc, char* argv[]) {
 	ImGui_ImplOpenGL3_Init();
 	ImGui::StyleColorsDark();
 
+	//LINK----------------------------------------------------------------------------------------------------------------------//
 	std::filesystem::path appPath(GetAppPath());
 	auto appDir = appPath.parent_path();
 	auto shaderPath = appDir / "shader";
@@ -77,7 +73,7 @@ int	main(int argc, char* argv[]) {
 	auto Objet3DPath_Pub = ObjetPath / "plane.fbx";
 
 	auto imagePath = appDir / "images";
-	auto image_PathGif = imagePath / "Mmmh_sun.gif";
+	auto image_PathGif = imagePath / "smugDance.gif";
 	auto image_PathGif2 = imagePath / "UwU3.gif";
 	auto image_Path = imagePath / "TextureShiba.png";
 	auto image_PathCrab = imagePath / "Crab_Texture.png";
@@ -131,7 +127,7 @@ int	main(int argc, char* argv[]) {
 
 	
 
-	// Read our .obj file
+	// Read our .obj file----------------------------------------------------------------------------------------------//
 	std::vector<unsigned short> indices;
 	std::vector< glm::vec3 > vertices;
 	std::vector< glm::vec2 > uvs;
@@ -177,11 +173,20 @@ int	main(int argc, char* argv[]) {
 	bool focus = true;
 	bool mouseClicRight = false;
 
+	//Variable slider
 	int slidertest = 1;
+	float sliderColorR = 0.0;
+	float sliderColorG = 0.0;
+	float sliderColorB = 0.0;
 
 	// Variable pour changer de Mesh
 	bool ChangeMesh = false;
 	bool ChangeGif = false;
+
+	//Variable Texture
+	int frame = 0;
+	int frame2 = 0;
+	bool ChangeProgram = false;
 
 	//Variables pour calcule des ms/frame
 	int nbFrames = 0;
@@ -249,18 +254,20 @@ int	main(int argc, char* argv[]) {
 	}
 
 	//-----------------------------------------------------------------------------------------------------------------------//
-	int frame = 0;
-	int frame2 = 0;
-	bool test = false;
+	
+
+	/////////////////////////////////////////////////////////////////////////////////////////// WHILE ////////////////////////////////////////////////////////////////////////////////////////////
+	
 	bool appRunning = true;
 	glUseProgram(programID);
 	while (appRunning) {
 
 		Dirs curDirs;
 		SDL_Event curEvent;
+		// Input-------------------------------------------------------------------------------------------------------------//
 		while (SDL_PollEvent(&curEvent))
 		{
-			if (curEvent.type == SDL_QUIT && curEvent.key.keysym.sym == SDLK_ESCAPE) {
+			if (curEvent.type == SDL_QUIT) {
 				return 0;
 			}
 
@@ -303,16 +310,13 @@ int	main(int argc, char* argv[]) {
 			}
 			if (curEvent.type == SDL_KEYDOWN)
 			{
-
 				if (curEvent.key.keysym.sym == SDLK_SPACE) {
 					SDL_WarpMouseInWindow(win, 1024 / 2, 768 / 2);
 				}
 				if (curEvent.key.keysym.sym == SDLK_d) {
-					//printf("RIGHT!");
 					curDirs.right = 1;
 				}
 				if (curEvent.key.keysym.sym == SDLK_q) {
-					//printf("LEFT!");
 					curDirs.left = 1;
 				}
 				if (curEvent.key.keysym.sym == SDLK_z) {
@@ -322,7 +326,7 @@ int	main(int argc, char* argv[]) {
 					curDirs.down = 1;
 				}
 			}
-
+			
 			ImGui_ImplSDL2_ProcessEvent(&curEvent);
 			if (!io.WantCaptureMouse)
 			{
@@ -332,18 +336,18 @@ int	main(int argc, char* argv[]) {
 			{
 				//use keyboard events not already used by ImGui
 			}
-		}
-
-			//glClear(GL_COLOR_BUFFER_BIT);
-			
-			
+		}	
+		//End Input--------------------------------------------------------------------------------------------------------//
 
 			// Clear the screen
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+			//Clock
 			auto curTime = Clock::now();
 			std::chrono::duration<float> elapsedSeconds = curTime - time;
 
+		//Calcul Perfs--------------------------------------------------------------------------------------------------//
+			
 			//ms lisser
 			Duration deltaTime = curTime - lastTime;
 			nbFrames++;
@@ -354,6 +358,7 @@ int	main(int argc, char* argv[]) {
 			//FPS = 1.0f / GC_3D::Seconds(FPSTime);
 			DebutFrame = FinFrame;
 
+		//Imgui----------------------------------------------------------------------------------------------------------//
 			//Render Loop
 			ImGui_ImplOpenGL3_NewFrame();
 			ImGui_ImplSDL2_NewFrame(win);
@@ -370,8 +375,7 @@ int	main(int argc, char* argv[]) {
 				FPS = 1.0f / GC_3D::Seconds(FPSTime);
 			}
 
-			// Draw some widgets ImGui
-			// Fenetre Performance 
+			//Window Perfs
 			ImGui::Begin("Perfs");
 
 			ImGui::LabelText("", "Time (s) : %f", elapsedSeconds * 1e-0);
@@ -379,20 +383,21 @@ int	main(int argc, char* argv[]) {
 			ImGui::LabelText("", "FPS : %f", FPS);
 
 			ImGui::End();
+			//End Window Perfs
 			
-			// Changement de Mesh
+			//Window Mesh
 			ImGui::Begin("Mesh");
 
 			if (ImGui::Button("Change Mesh")) {
-				if (test)
+				if (ChangeProgram)
 				{
 					glUseProgram(programID);
-					test = !test;
+					ChangeProgram = !ChangeProgram;
 				}
-				else if (!test) 
+				else if (!ChangeProgram) 
 				{
 					glUseProgram(programIDGif);
-					test = !test;
+					ChangeProgram = !ChangeProgram;
 				}
 
 				if (ChangeGif)
@@ -407,8 +412,9 @@ int	main(int argc, char* argv[]) {
 			}
 
 			ImGui::End();
+			//End Window Mesh
 
-			// Fenetre Modif
+			//Window Modif
 			ImGui::Begin("Modif Scene");
 
 			ImGui::LabelText("", "Object number : %i", ModelMatrix.size());
@@ -430,8 +436,6 @@ int	main(int argc, char* argv[]) {
 				}
 
 			}
-
-			
 
 			if (ImGui::Button("+ 10")) {
 				slidertest = slidertest + 10;
@@ -477,13 +481,30 @@ int	main(int argc, char* argv[]) {
 			}
 
 			ImGui::End();
+			//End Window Modif
 
-			// Bind Buffer
+			//Window Color
+			ImGui::Begin("Background color");
+
+			ImGui::SliderFloat("Color Red", &sliderColorR, 0.0f, 1.0f);
+			ImGui::SliderFloat("Color Green", &sliderColorG, 0.0f, 1.0f);
+			ImGui::SliderFloat("Color Blue", &sliderColorB, 0.0f, 1.0f);
+
+			glClearColor(sliderColorR, sliderColorG, sliderColorB, 0.0);
+
+			ImGui::End();
+			//End Window Color
+
+			//BUFFER------------------------------------------------------------------------------------------------------//
+			
+			//Bind Buffer
 			Vbuffer->BindBuffer(0, 3);
 			Cbuffer->BindBuffer(1, 3);
 			UVbuffer->BindBuffer(1, 2);
 
-			//CAMERA
+			//CAMERA-------------------------------------------------------------------------------------------------------//
+			// 
+			//Update camera
 			camera->UpdateCamera(win, curDirs, MousePosX, MousePosY, mouseClicRight);
 
 			// Matrix mvp
@@ -492,23 +513,24 @@ int	main(int argc, char* argv[]) {
 			// Afficher le nombre d'objet correspondant à la taille du tableau ModelMatrix
 			GLuint MatrixID;
 
-			if (test) {
+			if (ChangeProgram) {
 				MatrixID = glGetUniformLocation(programIDGif, "MVP");
 			}
-			else if (!test) {
+			else if (!ChangeProgram) {
 				MatrixID = glGetUniformLocation(programID, "MVP");
 			}
 
+			//Dessiner le nombre d'objets correspondant à la valeur du Slider
 			for (int i = 0; i < slidertest; i++) {
 
 				mvp = camera->ProjectionMatrix * camera->ViewMatrix * ModelMatrix[i];
 				
 				glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &mvp[0][0]);
 			
-				if (test) {
+				if (ChangeProgram) {
 					glUniform1i(TextureIDGif, 2 + i % 2);
 				}
-				else if (!test) {
+				else if (!ChangeProgram) {
 					glUniform1i(TextureID, i % 2);
 				}
 
@@ -527,9 +549,38 @@ int	main(int argc, char* argv[]) {
 				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementbuffer);
 			}
 				
-			if (test) {
+			//Refresh Gif
+			if (ChangeProgram) {
 				Texture::GifTick(t1, LayerIDGif, &frame);
 				Texture::GifTick(t4, LayerIDGif, &frame2);
+			}
+
+			//BackGround Color-----------------------------------------------------------------------------------------------------//
+			for (int i = 0; i < sliderColorR; i++) {
+
+				mvp = camera->ProjectionMatrix * camera->ViewMatrix * ModelMatrix[i];
+				GLuint MatrixID = glGetUniformLocation(programID, "MVP");
+				glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &mvp[0][0]);
+
+
+			}
+
+			for (int i = 0; i < sliderColorG; i++) {
+
+				mvp = camera->ProjectionMatrix * camera->ViewMatrix * ModelMatrix[i];
+				GLuint MatrixID = glGetUniformLocation(programID, "MVP");
+				glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &mvp[0][0]);
+
+
+			}
+
+			for (int i = 0; i < sliderColorB; i++) {
+
+				mvp = camera->ProjectionMatrix * camera->ViewMatrix * ModelMatrix[i];
+				GLuint MatrixID = glGetUniformLocation(programID, "MVP");
+				glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &mvp[0][0]);
+
+
 			}
 
 			// Enable depth test
@@ -544,6 +595,8 @@ int	main(int argc, char* argv[]) {
 			//Swap window as usual
 			SDL_GL_SwapWindow(win);
 	}
+	
+	/////////////////////////////////////////////////////////////////////////////////////// END WHILE ///////////////////////////////////////////////////////////////////////////////////////////
 
 	return 0;
 }
