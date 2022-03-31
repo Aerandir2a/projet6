@@ -65,7 +65,7 @@ int	main(int argc, char* argv[]) {
 	auto fsShaderPath = shaderPath / "1.model_loading.fs";
 
 	auto ObjetPath = appDir / "objets3D";
-	auto Objet3DPath = ObjetPath / "Crab.fbx";
+	auto Objet3DPath = ObjetPath / "shibaUV.fbx";
 	auto imagePath = appDir / "images";
 	auto image_Path = imagePath / "Crab_Texture.png";
 
@@ -94,11 +94,14 @@ int	main(int argc, char* argv[]) {
 	GLuint TextureID = glGetUniformLocation(programID, "myTextureSampler");
 	GLuint LayerID = glGetUniformLocation(programID, "layer");
 
+	/*
+	
 	Texture t1;
 	t1.LoadTexture2D(path_stringImage.c_str());
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D_ARRAY, t1.texture);
 	glUniform1i(TextureID, 0);
+	*/
 
 	/*
 
