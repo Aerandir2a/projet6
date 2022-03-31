@@ -43,14 +43,16 @@ public:
     vector<Vertex>       vertices;
     vector<unsigned int> indices;
     vector<TextureObj>      textures;
+    aiString matName;
     unsigned int VAO;
 
     // constructor
-    Mesh(vector<Vertex> vertices, vector<unsigned int> indices, vector<TextureObj> textures)
+    Mesh(vector<Vertex> vertices, vector<unsigned int> indices, vector<TextureObj> textures, aiString name)
     {
         this->vertices = vertices;
         this->indices = indices;
         this->textures = textures;
+        this->matName = name;
 
         // now that we have all the required data, set the vertex buffers and its attribute pointers.
         setupMesh();

@@ -6,7 +6,6 @@
 #include"gc_3d_defs.hpp"
 #include"shader/shader.hpp"
 //#define STB_IMAGE_IMPLEMENTATION
-#include "header/stb_image.h"
 #include "header/buffer.hpp"
 #include "header/controls.hpp"
 #include "header/camera.hpp"
@@ -14,15 +13,13 @@
 #include "dep/imgui/backends/imgui_impl_opengl3.h"
 #include "dep/imgui/backends/imgui_impl_sdl.h"
 
-
+#include "stb.h"
+#include "Texture.hpp"
 
 #include <filesystem>
 #include "header/directorySnippet.hpp"
 #include "header/model.h"
 #include "header/shader_.h"
-
-
-
 
 
 using namespace GC_3D;
@@ -65,9 +62,15 @@ int	main(int argc, char* argv[]) {
 	auto fsShaderPath = shaderPath / "1.model_loading.fs";
 
 	auto ObjetPath = appDir / "objets3D";
-	auto Objet3DPath = ObjetPath / "shiba.fbx";
+	auto Objet3DPath = ObjetPath / "crab.obj";
 	auto Objet3DPath_Frog = ObjetPath / "panneauPUB.obj";
 	
+	auto imagePath = appDir / "images";
+	auto image_PathGif = imagePath / "Mmmh_sun.gif";
+	auto image_Path = imagePath / "Crab_Texture.png";
+
+	std::string path_stringImage{ image_Path.u8string() };
+	std::string path_stringGif{ image_PathGif.u8string() };
 	std::string path_stringV{ vShaderPath.u8string() };
 	std::string path_stringF{ fShaderPath.u8string() };
 	std::string path_stringVS{ vShaderPath.u8string() };
@@ -80,7 +83,18 @@ int	main(int argc, char* argv[]) {
 	//GLuint programID = LoadShaders("C:/Users/LenyN/Documents/GitHub/projet6/shader/TranformVertexShader.vertexshader.txt", "C:/Users/LenyN/Documents/GitHub/projet6/shader/SimpleFragmentShader.fragmentshader.txt");
 	GLuint programID = LoadShaders(path_stringV.c_str(), path_stringF.c_str());
 
-	
+	GLuint TextureID = glGetUniformLocation(programID, "myTextureSampler");
+	GLuint LayerID = glGetUniformLocation(programID, "layer");
+
+	Texture t1;
+	t1.LoadTextureGif(path_stringGif.c_str());
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D_ARRAY, t1.texture);
+
+	Texture t2;
+	t2.LoadTexture2D(path_stringImage.c_str());
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, t2.texture);
 
 	//permet d'afficher la face avant mais pas la face derrière
 	//glEnable(GL_CULL_FACE);
@@ -90,7 +104,7 @@ int	main(int argc, char* argv[]) {
 	// Only during the initialisation
 	//GLuint MatrixID = glGetUniformLocation(programID, "MVP");
 
-	GLuint TextureID = glGetUniformLocation(programID, "myTextureSampler");
+	
 
 
 	/*
@@ -222,9 +236,14 @@ int	main(int argc, char* argv[]) {
 		{
 			ModelMesh.push_back(&ourModel_Frog);
 			ChangeMesh = false;
+			for each (Mesh mesh in ModelMesh[i]->meshes)
+			{
+				printf(const char(mesh.matName));
+			}
 		}
 	}
 
+	int frame = 0;
 	bool appRunning = true;
 	while (appRunning) {
 
@@ -509,15 +528,15 @@ int	main(int argc, char* argv[]) {
 				ModelMesh[i]->Draw(ourShader);
 
 				// Index buffer
-				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementbuffer);
-
-				// Draw the triangles !
-				glDrawElements(
-					GL_TRIANGLES,      // mode
-					indices.size(),    // count
-					GL_UNSIGNED_SHORT,   // type
-					(void*)0           // element array buffer offset
-				);
+				//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementbuffer);
+				//
+				//// Draw the triangles !
+				//glDrawElements(
+				//	GL_TRIANGLES,      // mode
+				//	indices.size(),    // count
+				//	GL_UNSIGNED_SHORT,   // type
+				//	(void*)0           // element array buffer offset
+				//);
 			}
 
 			// render the loaded model
@@ -525,6 +544,7 @@ int	main(int argc, char* argv[]) {
 			//model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f)); // translate it down so it's at the center of the scene
 			//model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));	// it's a bit too big for our scene, so scale it down
 						
+			Texture::GifTick(t1, LayerID, &frame);
 
 			// Enable depth test
 			glEnable(GL_DEPTH_TEST);

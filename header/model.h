@@ -153,8 +153,10 @@ private:
         std::vector<TextureObj> heightMaps = loadMaterialTextures(material, aiTextureType_AMBIENT, "texture_height");
         textures.insert(textures.end(), heightMaps.begin(), heightMaps.end());
 
+        aiString matName = material->GetName();
+
         // return a mesh object created from the extracted mesh data
-        return Mesh(vertices, indices, textures);
+        return Mesh(vertices, indices, textures, matName);
     }
 
     // checks all material textures of a given type and loads the textures if they're not loaded yet.
