@@ -74,16 +74,18 @@ int	main(int argc, char* argv[]) {
 
 	auto Objet3DPath_Crab = ObjetPath / "crab.obj";
 	auto Objet3DPath_Deer = ObjetPath / "deer.obj";
-	auto Objet3DPath_Pub = ObjetPath / "panneauPUB.obj";
+	auto Objet3DPath_Pub = ObjetPath / "cube.obj";
 
 	auto imagePath = appDir / "images";
 	auto image_PathGif = imagePath / "Mmmh_sun.gif";
+	auto image_PathGif2 = imagePath / "UwU3.gif";
 	auto image_Path = imagePath / "Crab_Texture.png";
 	auto image_PathDeer = imagePath / "Deer_Texture.png";
 
 	std::string path_stringImage{ image_Path.u8string() };
 	std::string path_stringImageDeer{ image_PathDeer.u8string() };
 	std::string path_stringGif{ image_PathGif.u8string() };
+	std::string path_stringGif2{ image_PathGif2.u8string() };
 
 	std::string path_stringV{ vShaderPath.u8string() };
 	std::string path_stringF{ fShaderPath.u8string() };
@@ -100,17 +102,12 @@ int	main(int argc, char* argv[]) {
 	std::string path_stringObjet_Pub{ Objet3DPath_Pub.u8string() };
 
 	GLuint programID = LoadShaders(path_stringV.c_str(), path_stringF.c_str());
-	//GLuint programIDGif = LoadShaders(path_stringV.c_str(), path_stringFG.c_str());
+	GLuint programIDGif = LoadShaders(path_stringV.c_str(), path_stringFG.c_str());
 
 	GLuint TextureID = glGetUniformLocation(programID, "myTextureSampler");
 
-	//GLuint TextureIDGif = glGetUniformLocation(programIDGif, "myTextureSampler");
-	//GLuint LayerIDGif = glGetUniformLocation(programIDGif, "layer");
-
-	//Texture t1;
-	//t1.LoadTextureGif(path_stringGif.c_str());
-	//glActiveTexture(GL_TEXTURE0);
-	//glBindTexture(GL_TEXTURE_2D_ARRAY, t1.texture);
+	GLuint TextureIDGif = glGetUniformLocation(programIDGif, "myTextureSampler");
+	GLuint LayerIDGif = glGetUniformLocation(programIDGif, "layer");
 
 	Texture t2;
 	t2.LoadTexture2D(path_stringImage.c_str());
@@ -121,6 +118,18 @@ int	main(int argc, char* argv[]) {
 	t2.LoadTexture2D(path_stringImageDeer.c_str());
 	glActiveTexture(GL_TEXTURE2);
 	glBindTexture(GL_TEXTURE_2D, t3.texture);
+
+	Texture t1;
+	t1.LoadTextureGif(path_stringGif.c_str());
+	glActiveTexture(GL_TEXTURE3);
+	glBindTexture(GL_TEXTURE_2D_ARRAY, t1.texture);
+	
+	Texture t4;
+	t4.LoadTextureGif(path_stringGif2.c_str());
+	glActiveTexture(GL_TEXTURE4);
+	glBindTexture(GL_TEXTURE_2D_ARRAY, t4.texture);
+
+	
 
 	// Read our .obj file
 	std::vector<unsigned short> indices;
@@ -172,6 +181,7 @@ int	main(int argc, char* argv[]) {
 
 	// Variable pour changer de Mesh
 	bool ChangeMesh = false;
+	bool ChangeGif = false;
 
 	//Variables pour calcule des ms/frame
 	int nbFrames = 0;
@@ -194,6 +204,7 @@ int	main(int argc, char* argv[]) {
 	std::vector<mat4> ModelMatrix;
 	//Tableau de Model
 	std::vector<Model*> ModelMesh;
+	std::vector<Model*> ModelMeshGif;
 	int IndexTexture[2] = {0, 1};
 
 	// Create number objects in box (64 000 objects 40x40x40)
@@ -222,28 +233,27 @@ int	main(int argc, char* argv[]) {
 			ModelMesh.push_back(&ourModel_Crab);
 			ChangeMesh = true;
 			
-			
 		}
 		else if (ChangeMesh)
 		{
 			ModelMesh.push_back(&ourModel_Deer);
 			ChangeMesh = false;
 			
-			//for each (Mesh mesh in ModelMesh[i]->meshes)
-			//{
-			//	const char* name2 = mesh.matName.C_Str();
-			//	if (*name2 == *name) {
-			//		//glUseProgram(programIDGif);
-			//		//glUniform1i(TextureID, 0);
-			//	}
-			//}
 		}
+	}
+
+	//Create Cube Mesh for GIF
+	for (int i = 0; i < ModelMatrix.size(); i++)
+	{
+		ModelMeshGif.push_back(&ourModel_Pub);
 	}
 
 	//-----------------------------------------------------------------------------------------------------------------------//
 	int frame = 0;
+	int frame2 = 0;
 	bool test = false;
 	bool appRunning = true;
+	glUseProgram(programID);
 	while (appRunning) {
 
 		Dirs curDirs;
@@ -325,7 +335,7 @@ int	main(int argc, char* argv[]) {
 		}
 
 			//glClear(GL_COLOR_BUFFER_BIT);
-			glUseProgram(programID);
+			
 			
 
 			// Clear the screen
@@ -376,11 +386,22 @@ int	main(int argc, char* argv[]) {
 			if (ImGui::Button("Change")) {
 				if (test)
 				{
-
+					glUseProgram(programID);
+					test = !test;
 				}
 				else if (!test) 
 				{
+					glUseProgram(programIDGif);
+					test = !test;
+				}
 
+				if (ChangeGif)
+				{
+					ChangeGif = !ChangeGif;
+				}
+				else if (!ChangeGif)
+				{
+					ChangeGif = !ChangeGif;
 				}
 
 			}
@@ -469,25 +490,47 @@ int	main(int argc, char* argv[]) {
 			glm::mat4 mvp;
 			
 			// Afficher le nombre d'objet correspondant à la taille du tableau ModelMatrix
-			//bool test = false;
+			GLuint MatrixID;
+
+			if (test) {
+				MatrixID = glGetUniformLocation(programIDGif, "MVP");
+			}
+			else if (!test) {
+				MatrixID = glGetUniformLocation(programID, "MVP");
+			}
+
 			for (int i = 0; i < slidertest; i++) {
 
 				mvp = camera->ProjectionMatrix * camera->ViewMatrix * ModelMatrix[i];
-				GLuint MatrixID = glGetUniformLocation(programID, "MVP");
+				
 				glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &mvp[0][0]);
-
-				glUniform1i(TextureID, i % 2);
+			
+				if (test) {
+					glUniform1i(TextureIDGif, 2 + i % 2);
+				}
+				else if (!test) {
+					glUniform1i(TextureID, i % 2);
+				}
 
 				ourShader.setMat4("model", ModelMatrix[i]);
-				ModelMesh[i]->Draw(ourShader);
 
-				
+				if (!ChangeGif)
+				{
+					ModelMesh[i]->Draw(ourShader);
+				}
+				else if (ChangeGif)
+				{
+					ModelMeshGif[i]->Draw(ourShader);
+				}
 
 				// Index buffer
 				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementbuffer);
 			}
-					
-			//Texture::GifTick(t1, LayerIDGif, &frame);
+				
+			if (test) {
+				Texture::GifTick(t1, LayerIDGif, &frame);
+				Texture::GifTick(t4, LayerIDGif, &frame2);
+			}
 
 			// Enable depth test
 			glEnable(GL_DEPTH_TEST);
