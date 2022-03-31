@@ -5,7 +5,7 @@
 #endif
 #include"gc_3d_defs.hpp"
 #include"shader/shader.hpp"
-#define STB_IMAGE_IMPLEMENTATION
+//#define STB_IMAGE_IMPLEMENTATION
 #include "header/stb_image.h"
 #include "header/buffer.hpp"
 #include "header/controls.hpp"
@@ -14,11 +14,10 @@
 #include "dep/imgui/backends/imgui_impl_opengl3.h"
 #include "dep/imgui/backends/imgui_impl_sdl.h"
 
-#include "header/objloader.hpp"
+
 
 #include <filesystem>
 #include "header/directorySnippet.hpp"
-#include "shader/ModelShader.h"
 #include "header/model.h"
 #include "header/shader_.h"
 
@@ -66,8 +65,8 @@ int	main(int argc, char* argv[]) {
 	auto fsShaderPath = shaderPath / "1.model_loading.fs";
 
 	auto ObjetPath = appDir / "objets3D";
-	auto Objet3DPath = ObjetPath / "shibaUV.fbx";
-	auto Objet3DPath_Frog = ObjetPath / "FrogUV.fbx";
+	auto Objet3DPath = ObjetPath / "Banana.obj";
+	auto Objet3DPath_Frog = ObjetPath / "Snake_angry.fbx";
 	
 	std::string path_stringV{ vShaderPath.u8string() };
 	std::string path_stringF{ fShaderPath.u8string() };
