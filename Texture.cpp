@@ -1,6 +1,7 @@
 #include <GL/glew.h>
 
 #include "stb.h"
+#include "gc_3d_defs.hpp"
 #include "Texture.hpp"
 
 void Texture::LoadTextureGif(const char* path) {
@@ -26,7 +27,7 @@ void Texture::LoadTextureGif(const char* path) {
 		glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGBA, x, y, frames, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
 		glGenerateMipmap(GL_TEXTURE_2D);
 	}
-
+	
 }
 
 void Texture::LoadTexture2D(const char* path) {
@@ -40,7 +41,6 @@ void Texture::LoadTexture2D(const char* path) {
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-
 	data = stbi_load(path, &x, &y, &nrChannels, 0);
 
 	if (data)
@@ -53,6 +53,7 @@ void Texture::LoadTexture2D(const char* path) {
 		}
 		glGenerateMipmap(GL_TEXTURE_2D);
 	}
+
 }
 
 void Texture::GifTick(Texture tex, GLuint lay,int* frame){

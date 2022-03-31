@@ -27,6 +27,15 @@
 
 using namespace GC_3D;
 
+void GLAPIENTRY glDebugCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam)
+{
+	if (type == GL_DEBUG_TYPE_ERROR)
+	{
+		printf(message);
+	}
+}
+
+
 int	main(int argc, char* argv[]) {
 	SDL_Init(SDL_INIT_VIDEO);
 
@@ -45,7 +54,7 @@ int	main(int argc, char* argv[]) {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glewInit();
 
-
+	glDebugMessageCallback(&glDebugCallback, nullptr);
 
 	//init ImGUI
 	IMGUI_CHECKVERSION();
@@ -65,9 +74,9 @@ int	main(int argc, char* argv[]) {
 	auto fsShaderPath = shaderPath / "1.model_loading.fs";
 
 	auto ObjetPath = appDir / "objets3D";
-	auto Objet3DPath = ObjetPath / "Crab.fbx";
+	auto Objet3DPath = ObjetPath / "crab.obj";
 	auto imagePath = appDir / "images";
-	auto image_Path = imagePath / "Crab_Texture.png";
+	auto image_Path = imagePath / "UwU2.jpg";
 
 	std::string path_stringImage{ image_Path.u8string() };
 	
@@ -97,8 +106,9 @@ int	main(int argc, char* argv[]) {
 	Texture t1;
 	t1.LoadTexture2D(path_stringImage.c_str());
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D_ARRAY, t1.texture);
-	glUniform1i(TextureID, 0);
+	glBindTexture(GL_TEXTURE_2D, t1.texture);
+	//glUseProgram(programID);
+	//glUniform1i(TextureID, 0);
 
 	/*
 
@@ -146,18 +156,19 @@ int	main(int argc, char* argv[]) {
 	std::vector< glm::vec3 > normals; // Won't be used at the moment.
 	//bool res = loadAssImp("C:/Users/LenyN/Documents/GitHub/projet6/objets3D/shibaUV.fbx", indices, vertices, uvs, normals);
 	Model ourModel(path_stringObjet.c_str());
-
+	
 
 	// build and compile shaders
 	// -------------------------
 	Shader ourShader(path_stringVS.c_str(), path_stringFS.c_str());
+	
 
 	// Generate a buffer for the indices
-	GLuint elementbuffer;
-	glGenBuffers(1, &elementbuffer);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementbuffer);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned short), indices.data(), GL_STATIC_DRAW);
-
+	//GLuint elementbuffer;
+	//glGenBuffers(1, &elementbuffer);
+	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementbuffer);
+	//glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned short), indices.data(), GL_STATIC_DRAW);
+	//
 	GLuint VertexArrayID;
 	glGenVertexArrays(1, &VertexArrayID);
 	glBindVertexArray(VertexArrayID);
@@ -429,6 +440,7 @@ int	main(int argc, char* argv[]) {
 			ImGui::End();
 
 			// Bind Buffer
+			glBindVertexArray(VertexArrayID);
 			Vbuffer->BindBuffer(0, 3);
 			Cbuffer->BindBuffer(1, 3);
 			UVbuffer->BindBuffer(1, 2);
@@ -483,20 +495,20 @@ int	main(int argc, char* argv[]) {
 				mvp = camera->ProjectionMatrix * camera->ViewMatrix * ModelMatrix[i];
 				GLuint MatrixID = glGetUniformLocation(programID, "MVP");
 				glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &mvp[0][0]);
-
+				
 				ourShader.setMat4("model", ModelMatrix[i]);
 				ourModel.Draw(ourShader);
 
 				// Index buffer
-				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementbuffer);
+				//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementbuffer);
 
 				// Draw the triangles !
-				glDrawElements(
-					GL_TRIANGLES,      // mode
-					indices.size(),    // count
-					GL_UNSIGNED_SHORT,   // type
-					(void*)0           // element array buffer offset
-				);
+				//glDrawElements(
+				//	GL_TRIANGLES,      // mode
+				//	indices.size(),    // count
+				//	GL_UNSIGNED_SHORT,   // type
+				//	(void*)0           // element array buffer offset
+				//);
 			}
 
 			// render the loaded model
