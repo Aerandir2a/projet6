@@ -14,7 +14,6 @@
 #include "dep/imgui/backends/imgui_impl_opengl3.h"
 #include "dep/imgui/backends/imgui_impl_sdl.h"
 
-#include "header/objloader.hpp"
 
 #include <filesystem>
 #include "header/directorySnippet.hpp"
