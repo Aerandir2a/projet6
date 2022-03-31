@@ -65,8 +65,8 @@ int	main(int argc, char* argv[]) {
 	auto fsShaderPath = shaderPath / "1.model_loading.fs";
 
 	auto ObjetPath = appDir / "objets3D";
-	auto Objet3DPath = ObjetPath / "Banana.obj";
-	auto Objet3DPath_Frog = ObjetPath / "Snake_angry.fbx";
+	auto Objet3DPath = ObjetPath / "shiba.fbx";
+	auto Objet3DPath_Frog = ObjetPath / "panneauPUB.obj";
 	
 	std::string path_stringV{ vShaderPath.u8string() };
 	std::string path_stringF{ fShaderPath.u8string() };
