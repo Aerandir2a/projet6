@@ -3,7 +3,7 @@
 // Input vertex data, different for all executions of this shader.
 layout(location = 0) in vec3 vertexPosition_modelspace;
 layout(location = 1) in vec3 vertexColor;
-//layout(location = 1) in vec2 textCoord;
+//layout(location = 1) in vec2 texCoord;
 layout (location = 0) in vec3 aPos;
 
 // Output data ; will be interpolated for each fragment.
@@ -22,6 +22,5 @@ void main(){
 	// to produce the color of each fragment
 	fragmentColor = vertexColor;
 
-	//UV = textCoord;
-
+	//UV = texCoord;
 }

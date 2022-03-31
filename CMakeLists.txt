@@ -12,13 +12,8 @@ shader/SimpleFragmentShader.fragmentshader.txt
 shader/1.model_loading.fs
 shader/1.model_loading.vs
 header/stb_image.h
-images/UwU.jpg
-images/UwU2.jpg
-shader/ModelShader.h
 glad/glad.h
 src/directorySnippet.cpp
-src/objloader.cpp
-header/objloader.hpp
 header/buffer.hpp
 header/camera.hpp
 header/controls.hpp
@@ -29,6 +24,10 @@ header/shader_.h
 src/buffer.cpp
 src/camera.cpp
 src/controls.cpp
+Texture.hpp 
+Texture.cpp
+stb.c
+stb.h
 )
 
 add_subdirectory(SDL dep/SDL)
@@ -42,6 +41,11 @@ add_custom_target(copy_objets3D COMMAND ${CMAKE_COMMAND}
 -E copy_directory ${CMAKE_SOURCE_DIR}/objets3D $<TARGET_FILE_DIR:moteur>/objets3D)
 
 add_dependencies(moteur copy_objets3D)
+
+add_custom_target(copy_images COMMAND ${CMAKE_COMMAND}
+-E copy_directory ${CMAKE_SOURCE_DIR}/images $<TARGET_FILE_DIR:moteur>/images)
+
+add_dependencies(moteur copy_images)
 
 set_property(TARGET moteur PROPERTY CXX_STANDARD 17)
 

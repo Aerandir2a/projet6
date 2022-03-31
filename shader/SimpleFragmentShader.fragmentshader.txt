@@ -9,8 +9,10 @@ in vec2 UV;
 // Ouput data
 out vec3 color;
 
-
-uniform sampler2D myTextureSample;
+// Values that stay constant for the whole mesh.
+//uniform sampler2DArray myTextureSampler;
+uniform sampler2D myTextureSampler;
+//uniform int layer;
 
 void main(){
 
@@ -18,6 +20,8 @@ void main(){
     // interpolated between all 3 surrounding vertices
     color = fragmentColor;
 
-    //color = texture( myTextureSample, UV).rbg;
+    // Output color = color of the texture at the specified UV
+	//color = texture( myTextureSampler, vec3(UV,layer) ).rgb;
+	//color = texture( myTextureSampler, UV ).rgb;
 
 }
