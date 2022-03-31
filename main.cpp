@@ -67,6 +67,7 @@ int	main(int argc, char* argv[]) {
 
 	auto ObjetPath = appDir / "objets3D";
 	auto Objet3DPath = ObjetPath / "shibaUV.fbx";
+	auto Objet3DPath_Frog = ObjetPath / "FrogUV.fbx";
 	
 	std::string path_stringV{ vShaderPath.u8string() };
 	std::string path_stringF{ fShaderPath.u8string() };
@@ -74,6 +75,7 @@ int	main(int argc, char* argv[]) {
 	std::string path_stringFS{ fShaderPath.u8string() };
 
 	std::string path_stringObjet{ Objet3DPath.u8string() };
+	std::string path_stringObjet_Frog{ Objet3DPath_Frog.u8string() };
 
 
 	//GLuint programID = LoadShaders("C:/Users/LenyN/Documents/GitHub/projet6/shader/TranformVertexShader.vertexshader.txt", "C:/Users/LenyN/Documents/GitHub/projet6/shader/SimpleFragmentShader.fragmentshader.txt");
@@ -138,6 +140,7 @@ int	main(int argc, char* argv[]) {
 	std::vector< glm::vec3 > normals; // Won't be used at the moment.
 	//bool res = loadAssImp("C:/Users/LenyN/Documents/GitHub/projet6/objets3D/shibaUV.fbx", indices, vertices, uvs, normals);
 	Model ourModel(path_stringObjet.c_str());
+	Model ourModel_Frog(path_stringObjet_Frog.c_str());
 
 
 	// build and compile shaders
@@ -163,25 +166,12 @@ int	main(int argc, char* argv[]) {
 	Cbuffer->CreateBuffer(vertices.data(), vertices.size() * sizeof(glm::vec3));
 	UVbuffer->CreateBuffer(uvs.data(), uvs.size() * sizeof(glm::vec2));
 
-	//GLuint vertexbuffer;
-	//glGenBuffers(1, &vertexbuffer);
-	//glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
-	//glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec3), vertices.data(), GL_STATIC_DRAW);
-	//GLuint colorbuffer;
-	//glGenBuffers(1, &colorbuffer);
-	//glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
-	//glBufferData(GL_ELEMENT_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec3), vertices.data(), GL_STATIC_DRAW);
-	//GLuint uvbuffer;
-	//glGenBuffers(1, &uvbuffer);
-	//glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
-	//glBufferData(GL_ARRAY_BUFFER, uvs.size() * sizeof(glm::vec2), uvs.data(), GL_STATIC_DRAW);
-
 	// Tableau de position des objets
 	std::vector<mat4> ModelMatrix;
 
 	//Interaction avec la souris
-	int MousePosX = 0;
-	int MousePosY = 0;
+	int MousePosX = 1024/2;
+	int MousePosY = 768/2;
 	bool focus = true;
 	bool mouseClicRight = false;
 
@@ -197,7 +187,6 @@ int	main(int argc, char* argv[]) {
 
 	if (win != nullptr) {
 		SDL_WarpMouseInWindow(win, 1024 / 2, 768 / 2);
-		//computeMatricesFromInputs(curDirs, MousePosX, MousePosY);
 	}
 
 	Camera* camera = new Camera();
@@ -215,6 +204,25 @@ int	main(int argc, char* argv[]) {
 					k * scale * vec3(0.0f, 0.0f, -1.0f);
 				ModelMatrix.push_back(glm::translate(mat4(1.0f), pos));
 			}
+		}
+	}
+
+	// Mesh
+	bool ChangeMesh = false;
+
+	//Tableau de Model
+	std::vector<Model*> ModelMesh;
+	for (int i = 0; i < ModelMatrix.size(); i++) 
+	{
+		if (!ChangeMesh)
+		{
+			ModelMesh.push_back(&ourModel);
+			ChangeMesh = true;
+		}
+		else if (ChangeMesh)
+		{
+			ModelMesh.push_back(&ourModel_Frog);
+			ChangeMesh = false;
 		}
 	}
 
@@ -242,8 +250,9 @@ int	main(int argc, char* argv[]) {
 			}
 
 			if (curEvent.type == SDL_MOUSEMOTION) {
-				SDL_GetMouseState(&MousePosX, &MousePosY);
-				//computeMatricesFromInputs(MousePosX, MousePosY);
+				if (mouseClicRight) {
+					SDL_GetMouseState(&MousePosX, &MousePosY);
+				}
 			}
 
 			if (curEvent.type == SDL_MOUSEBUTTONDOWN) {
@@ -340,6 +349,25 @@ int	main(int argc, char* argv[]) {
 			ImGui::LabelText("", "Time (s) : %f", elapsedSeconds * 1e-0);
 			ImGui::LabelText("", "ms/frame : %f", msFrames);
 			ImGui::LabelText("", "FPS : %f", FPS);
+
+			ImGui::End();
+			
+			// Changement de Mesh
+			ImGui::Begin("Mesh");
+
+			if (ImGui::Button("Change")) {
+				if (!ChangeMesh)
+				{
+					//MeshModel = ourModel;
+					//ChangeMesh = true;
+				}
+				else if (ChangeMesh) 
+				{
+					//MeshModel = ourModel_Frog;
+					//ChangeMesh = false;
+				}
+
+			}
 
 			ImGui::End();
 
@@ -470,13 +498,16 @@ int	main(int argc, char* argv[]) {
 			glm::mat4 mvp;
 			
 			// Afficher le nombre d'objet correspondant à la taille du tableau ModelMatrix
+			//bool test = false;
 			for (int i = 0; i < slidertest; i++) {
+
 				mvp = camera->ProjectionMatrix * camera->ViewMatrix * ModelMatrix[i];
 				GLuint MatrixID = glGetUniformLocation(programID, "MVP");
 				glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &mvp[0][0]);
 
 				ourShader.setMat4("model", ModelMatrix[i]);
-				ourModel.Draw(ourShader);
+				//MeshModel.Draw(ourShader);
+				ModelMesh[i]->Draw(ourShader);
 
 				// Index buffer
 				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementbuffer);
@@ -511,136 +542,3 @@ int	main(int argc, char* argv[]) {
 
 	return 0;
 }
-
-/*void old() {
-	auto time = Clock::now(); // à mettre avant le double while
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glEnable(GL_DEPTH_TEST);
-	glDepthMask(GL_TRUE);
-	glEnable(GL_LIGHTING);
-	glEnable(GL_LIGHT0);
-	GLfloat ambientLightFull[] = { 1.0f, 0.25f, 0.20f, 0.0f };
-	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, ambientLightFull);
-	float gray[] = { 0.75f, 0.75f, 0.75f, 1.0f };
-	glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, gray);
-
-	const float radius = 0.5;
-
-	auto curTime = Clock::now();
-	std::chrono::duration<float> fTime = curTime - time;
-	float camX = sin(fTime.count()) * radius;
-	float camZ = cos(fTime.count()) * radius;
-
-	vec3 cameraTarget = vec3(0.0, 0.0, -2.0);
-
-	vec3 cameraPos = cameraTarget - 4.0f * vec3(camX, -0.5, camZ);
-
-	// Creation de la camera
-	mat4 view;
-	view = lookAt(cameraPos, //Position de la camera
-		cameraTarget, //Cible à regarder
-		vec3(0.0, 1.0, 0.0)); //position vertical
-	mat4 camFrustum = frustum(-1.0, 1.0, -1.0, 1.0, 1.0, 1000.0);
-
-	glMatrixMode(GL_PROJECTION);
-	glLoadMatrixf(&camFrustum[0][0]);
-
-	glMatrixMode(GL_MODELVIEW);
-	glLoadMatrixf(&view[0][0]);
-
-	glTranslatef(0.0, 0.0, -2.0);
-
-	vec3 p0 = vec3(-1.0, -1.0, 1.0);
-	vec3 p1 = vec3(-1.0, 1.0, 1.0);
-	vec3 p2 = vec3(1.0, 1.0, 1.0);
-	vec3 p3 = vec3(1.0, -1.0, 1.0);
-	vec3 p4 = vec3(-1.0, -1.0, -1.0);
-	vec3 p5 = vec3(-1.0, 1.0, -1.0);
-	vec3 p6 = vec3(1.0, 1.0, -1.0);
-	vec3 p7 = vec3(1.0, -1.0, -1.0);
-
-	Geometry test;
-
-
-	test.m_Pos = {
-		p0,p1,p2,p3,
-		p0,p1,p4,p5,
-		p4,p5,p6,p7,
-		p7,p6,p2,p3,
-		p0,p3,p4,p7,
-		p1,p2,p5,p6
-	};
-
-	test.m_Normals = {
-		vec3(0.0,0.0,1.0),vec3(0.0,0.0,1.0),vec3(0.0,0.0,1.0),vec3(0.0,0.0,1.0),
-		vec3(-1.0,0.0,0.0),vec3(-1.0,0.0,0.0),vec3(-1.0,0.0,0.0),vec3(-1.0,0.0,0.0),
-		vec3(0.0,0.0,-1.0),vec3(0.0,0.0,-1.0),vec3(0.0,0.0,-1.0),vec3(0.0,0.0,-1.0),
-		vec3(1.0,0.0,0.0),vec3(1.0,0.0,0.0),vec3(1.0,0.0,0.0),vec3(1.0,0.0,0.0),
-		vec3(0.0,-1.0,0.0),vec3(0.0,-1.0,0.0),vec3(0.0,-1.0,0.0),vec3(0.0,-1.0,0.0),
-		vec3(0.0,1.0,0.0),vec3(0.0,1.0,0.0),vec3(0.0,1.0,0.0),vec3(0.0,1.0,0.0),
-	};
-
-	test.m_Indices = {
-		0,1,2,0,2,3,
-		4,5,6,5,6,7,
-		8,9,10,8,10,11,
-		12,13,14,12,14,15,
-		16,17,18,16,18,19,
-		20,21,22,21,22,23
-	};
-
-	test.Bind();
-	test.Draw();
-
-	glBegin(GL_TRIANGLES);
-	//Front
-	glColor4f(0.0, 1.0, 0.0, 1.0);
-	glVertex3f(-1.0f, -1.0f, 1.0f);
-	glVertex3f(1.0f, -1.0f, 1.0f);
-	glVertex3f(1.0f, 1.0f, 1.0f);
-	glVertex3f(-1.0f, -1.0f, 1.0f);
-	glVertex3f(-1.0f, 1.0f, 1.0f);
-	glVertex3f(1.0f, 1.0f, 1.0f);
-	//left
-	glColor4f(0.0, 0.0, 1.0, 1.0);
-	glVertex3f(-1.0f, -1.0f, 1.0f);
-	glVertex3f(-1.0f, -1.0f, -1.0f);
-	glVertex3f(-1.0f, 1.0f, 1.0f);
-	glVertex3f(-1.0f, 1.0f, 1.0f);
-	glVertex3f(-1.0f, 1.0f, -1.0f);
-	glVertex3f(-1.0f, -1.0f, -1.0f);
-	//right
-	glColor4f(0.0, 1.0, 1.0, 1.0);
-	glVertex3f(1.0f, -1.0f, 1.0f);
-	glVertex3f(1.0f, -1.0f, -1.0f);
-	glVertex3f(1.0f, 1.0f, 1.0f);
-	glVertex3f(1.0f, 1.0f, 1.0f);
-	glVertex3f(1.0f, 1.0f, -1.0f);
-	glVertex3f(1.0f, -1.0f, -1.0f);
-	//back
-	glColor4f(1.0, 0.0, 0.0, -1.0);
-	glVertex3f(-1.0f, -1.0f, -1.0f);
-	glVertex3f(1.0f, -1.0f, -1.0f);
-	glVertex3f(1.0f, 1.0f, -1.0f);
-	glVertex3f(-1.0f, -1.0f, -1.0f);
-	glVertex3f(-1.0f, 1.0f, -1.0f);
-	glVertex3f(1.0f, 1.0f, -1.0f);
-	//top
-	glColor4f(1.0, 0.0, 1.0, -1.0);
-	glVertex3f(-1.0f, 1.0f, 1.0f);
-	glVertex3f(-1.0f, 1.0f, -1.0f);
-	glVertex3f(1.0f, 1.0f, 1.0f);
-	glVertex3f(1.0f, 1.0f, 1.0f);
-	glVertex3f(1.0f, 1.0f, -1.0f);
-	glVertex3f(-1.0f, 1.0f, -1.0f);
-	//bot
-	glColor4f(1.0, 1.0, 0.0, -1.0);
-	glVertex3f(-1.0f, -1.0f, 1.0f);
-	glVertex3f(-1.0f, -1.0f, -1.0f);
-	glVertex3f(1.0f, -1.0f, 1.0f);
-	glVertex3f(1.0f, -1.0f, 1.0f);
-	glVertex3f(1.0f, -1.0f, -1.0f);
-	glVertex3f(-1.0f, -1.0f, -1.0f);
-
-	glEnd();
-}*/
