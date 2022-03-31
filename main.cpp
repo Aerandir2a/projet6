@@ -84,7 +84,7 @@ int	main(int argc, char* argv[]) {
 	std::string path_stringImage{ image_Path.u8string() };
 	std::string path_stringImageDeer{ image_PathDeer.u8string() };
 	std::string path_stringGif{ image_PathGif.u8string() };
-	
+
 	std::string path_stringV{ vShaderPath.u8string() };
 	std::string path_stringF{ fShaderPath.u8string() };
 	std::string path_stringFG{ fGShaderPath.u8string() };
@@ -163,8 +163,8 @@ int	main(int argc, char* argv[]) {
 
 	//VARIABLE------------------------------------------------------------------------------------------------------------------------//
 	//Interaction avec la souris
-	int MousePosX = 1024/2;
-	int MousePosY = 768/2;
+	int MousePosX = 1024 / 2;
+	int MousePosY = 768 / 2;
 	bool focus = true;
 	bool mouseClicRight = false;
 
@@ -189,11 +189,12 @@ int	main(int argc, char* argv[]) {
 	camera->CreateCamera();
 
 	//TABLE---------------------------------------------------------------------------------------------------------------------------//
-	
+
 	// Tableau de position des objets
 	std::vector<mat4> ModelMatrix;
 	//Tableau de Model
 	std::vector<Model*> ModelMesh;
+	int IndexTexture[2] = {0, 1};
 
 	// Create number objects in box (64 000 objects 40x40x40)
 	int nMax = 40;
@@ -475,11 +476,12 @@ int	main(int argc, char* argv[]) {
 				GLuint MatrixID = glGetUniformLocation(programID, "MVP");
 				glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &mvp[0][0]);
 
+				glUniform1i(TextureID, i % 2);
+
 				ourShader.setMat4("model", ModelMatrix[i]);
-				//MeshModel.Draw(ourShader);
 				ModelMesh[i]->Draw(ourShader);
 
-				glUniform1i(TextureID, 0);
+				
 
 				// Index buffer
 				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementbuffer);
