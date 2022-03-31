@@ -14,27 +14,18 @@
 #include "dep/imgui/backends/imgui_impl_opengl3.h"
 #include "dep/imgui/backends/imgui_impl_sdl.h"
 
-#include "header/objloader.hpp"
+
 
 #include <filesystem>
 #include "header/directorySnippet.hpp"
-#include "shader/ModelShader.h"
 #include "header/model.h"
 #include "header/shader_.h"
 
-#include "stb.h"
-#include "Texture.hpp"
+
+
+
 
 using namespace GC_3D;
-
-void GLAPIENTRY glDebugCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam)
-{
-	if (type == GL_DEBUG_TYPE_ERROR)
-	{
-		printf(message);
-	}
-}
-
 
 int	main(int argc, char* argv[]) {
 	SDL_Init(SDL_INIT_VIDEO);
@@ -54,7 +45,7 @@ int	main(int argc, char* argv[]) {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glewInit();
 
-	glDebugMessageCallback(&glDebugCallback, nullptr);
+
 
 	//init ImGUI
 	IMGUI_CHECKVERSION();
@@ -74,11 +65,8 @@ int	main(int argc, char* argv[]) {
 	auto fsShaderPath = shaderPath / "1.model_loading.fs";
 
 	auto ObjetPath = appDir / "objets3D";
-	auto Objet3DPath = ObjetPath / "crab.obj";
-	auto imagePath = appDir / "images";
-	auto image_Path = imagePath / "UwU2.jpg";
-
-	std::string path_stringImage{ image_Path.u8string() };
+	auto Objet3DPath = ObjetPath / "shiba.fbx";
+	auto Objet3DPath_Frog = ObjetPath / "panneauPUB.obj";
 	
 	std::string path_stringV{ vShaderPath.u8string() };
 	std::string path_stringF{ fShaderPath.u8string() };
@@ -86,7 +74,9 @@ int	main(int argc, char* argv[]) {
 	std::string path_stringFS{ fShaderPath.u8string() };
 
 	std::string path_stringObjet{ Objet3DPath.u8string() };
-	
+	std::string path_stringObjet_Frog{ Objet3DPath_Frog.u8string() };
+
+
 	//GLuint programID = LoadShaders("C:/Users/LenyN/Documents/GitHub/projet6/shader/TranformVertexShader.vertexshader.txt", "C:/Users/LenyN/Documents/GitHub/projet6/shader/SimpleFragmentShader.fragmentshader.txt");
 	GLuint programID = LoadShaders(path_stringV.c_str(), path_stringF.c_str());
 
@@ -101,14 +91,7 @@ int	main(int argc, char* argv[]) {
 	//GLuint MatrixID = glGetUniformLocation(programID, "MVP");
 
 	GLuint TextureID = glGetUniformLocation(programID, "myTextureSampler");
-	GLuint LayerID = glGetUniformLocation(programID, "layer");
 
-	Texture t1;
-	t1.LoadTexture2D(path_stringImage.c_str());
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, t1.texture);
-	//glUseProgram(programID);
-	//glUniform1i(TextureID, 0);
 
 	/*
 
@@ -156,19 +139,19 @@ int	main(int argc, char* argv[]) {
 	std::vector< glm::vec3 > normals; // Won't be used at the moment.
 	//bool res = loadAssImp("C:/Users/LenyN/Documents/GitHub/projet6/objets3D/shibaUV.fbx", indices, vertices, uvs, normals);
 	Model ourModel(path_stringObjet.c_str());
-	
+	Model ourModel_Frog(path_stringObjet_Frog.c_str());
+
 
 	// build and compile shaders
 	// -------------------------
 	Shader ourShader(path_stringVS.c_str(), path_stringFS.c_str());
-	
 
 	// Generate a buffer for the indices
-	//GLuint elementbuffer;
-	//glGenBuffers(1, &elementbuffer);
-	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementbuffer);
-	//glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned short), indices.data(), GL_STATIC_DRAW);
-	//
+	GLuint elementbuffer;
+	glGenBuffers(1, &elementbuffer);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementbuffer);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned short), indices.data(), GL_STATIC_DRAW);
+
 	GLuint VertexArrayID;
 	glGenVertexArrays(1, &VertexArrayID);
 	glBindVertexArray(VertexArrayID);
@@ -182,25 +165,12 @@ int	main(int argc, char* argv[]) {
 	Cbuffer->CreateBuffer(vertices.data(), vertices.size() * sizeof(glm::vec3));
 	UVbuffer->CreateBuffer(uvs.data(), uvs.size() * sizeof(glm::vec2));
 
-	//GLuint vertexbuffer;
-	//glGenBuffers(1, &vertexbuffer);
-	//glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
-	//glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec3), vertices.data(), GL_STATIC_DRAW);
-	//GLuint colorbuffer;
-	//glGenBuffers(1, &colorbuffer);
-	//glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
-	//glBufferData(GL_ELEMENT_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec3), vertices.data(), GL_STATIC_DRAW);
-	//GLuint uvbuffer;
-	//glGenBuffers(1, &uvbuffer);
-	//glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
-	//glBufferData(GL_ARRAY_BUFFER, uvs.size() * sizeof(glm::vec2), uvs.data(), GL_STATIC_DRAW);
-
 	// Tableau de position des objets
 	std::vector<mat4> ModelMatrix;
 
 	//Interaction avec la souris
-	int MousePosX = 0;
-	int MousePosY = 0;
+	int MousePosX = 1024/2;
+	int MousePosY = 768/2;
 	bool focus = true;
 	bool mouseClicRight = false;
 
@@ -216,7 +186,6 @@ int	main(int argc, char* argv[]) {
 
 	if (win != nullptr) {
 		SDL_WarpMouseInWindow(win, 1024 / 2, 768 / 2);
-		//computeMatricesFromInputs(curDirs, MousePosX, MousePosY);
 	}
 
 	Camera* camera = new Camera();
@@ -237,7 +206,25 @@ int	main(int argc, char* argv[]) {
 		}
 	}
 
-	int frame = 0;
+	// Mesh
+	bool ChangeMesh = false;
+
+	//Tableau de Model
+	std::vector<Model*> ModelMesh;
+	for (int i = 0; i < ModelMatrix.size(); i++) 
+	{
+		if (!ChangeMesh)
+		{
+			ModelMesh.push_back(&ourModel);
+			ChangeMesh = true;
+		}
+		else if (ChangeMesh)
+		{
+			ModelMesh.push_back(&ourModel_Frog);
+			ChangeMesh = false;
+		}
+	}
+
 	bool appRunning = true;
 	while (appRunning) {
 
@@ -262,8 +249,9 @@ int	main(int argc, char* argv[]) {
 			}
 
 			if (curEvent.type == SDL_MOUSEMOTION) {
-				SDL_GetMouseState(&MousePosX, &MousePosY);
-				//computeMatricesFromInputs(MousePosX, MousePosY);
+				if (mouseClicRight) {
+					SDL_GetMouseState(&MousePosX, &MousePosY);
+				}
 			}
 
 			if (curEvent.type == SDL_MOUSEBUTTONDOWN) {
@@ -362,6 +350,25 @@ int	main(int argc, char* argv[]) {
 			ImGui::LabelText("", "FPS : %f", FPS);
 
 			ImGui::End();
+			
+			// Changement de Mesh
+			ImGui::Begin("Mesh");
+
+			if (ImGui::Button("Change")) {
+				if (!ChangeMesh)
+				{
+					//MeshModel = ourModel;
+					//ChangeMesh = true;
+				}
+				else if (ChangeMesh) 
+				{
+					//MeshModel = ourModel_Frog;
+					//ChangeMesh = false;
+				}
+
+			}
+
+			ImGui::End();
 
 			// Fenetre Modif
 			ImGui::Begin("Modif Scene");
@@ -440,7 +447,6 @@ int	main(int argc, char* argv[]) {
 			ImGui::End();
 
 			// Bind Buffer
-			glBindVertexArray(VertexArrayID);
 			Vbuffer->BindBuffer(0, 3);
 			Cbuffer->BindBuffer(1, 3);
 			UVbuffer->BindBuffer(1, 2);
@@ -491,24 +497,27 @@ int	main(int argc, char* argv[]) {
 			glm::mat4 mvp;
 			
 			// Afficher le nombre d'objet correspondant à la taille du tableau ModelMatrix
+			//bool test = false;
 			for (int i = 0; i < slidertest; i++) {
+
 				mvp = camera->ProjectionMatrix * camera->ViewMatrix * ModelMatrix[i];
 				GLuint MatrixID = glGetUniformLocation(programID, "MVP");
 				glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &mvp[0][0]);
-				
+
 				ourShader.setMat4("model", ModelMatrix[i]);
-				ourModel.Draw(ourShader);
+				//MeshModel.Draw(ourShader);
+				ModelMesh[i]->Draw(ourShader);
 
 				// Index buffer
-				//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementbuffer);
+				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementbuffer);
 
 				// Draw the triangles !
-				//glDrawElements(
-				//	GL_TRIANGLES,      // mode
-				//	indices.size(),    // count
-				//	GL_UNSIGNED_SHORT,   // type
-				//	(void*)0           // element array buffer offset
-				//);
+				glDrawElements(
+					GL_TRIANGLES,      // mode
+					indices.size(),    // count
+					GL_UNSIGNED_SHORT,   // type
+					(void*)0           // element array buffer offset
+				);
 			}
 
 			// render the loaded model
@@ -516,7 +525,6 @@ int	main(int argc, char* argv[]) {
 			//model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f)); // translate it down so it's at the center of the scene
 			//model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));	// it's a bit too big for our scene, so scale it down
 						
-			//Texture::GifTick(t1, LayerID, &frame);
 
 			// Enable depth test
 			glEnable(GL_DEPTH_TEST);
